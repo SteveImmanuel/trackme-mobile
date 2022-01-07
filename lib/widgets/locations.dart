@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
+import 'package:trackme_mobile/models/user.dart';
+import 'package:trackme_mobile/models/location.dart';
 
 class LocationListItem extends StatelessWidget {
   const LocationListItem(
@@ -104,9 +107,7 @@ class LocationList extends StatefulWidget {
 
 class _LocationListState extends State<LocationList> {
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
-  final List<int> _listData = [];
-  int tempCounter = 0;
-  bool _isLoading = true;
+  late List<Location> _listData = [];
 
   void _onConfirmDelete(BuildContext context, int idx) {
     // TODO: call api delete
@@ -139,83 +140,68 @@ class _LocationListState extends State<LocationList> {
     );
   }
 
-  Future<void> TestSleep() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    for (int i = 0; i < 5; i++) {
-      await Future.delayed(const Duration(milliseconds: 100));
-      _insertItem();
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    TestSleep();
-  }
-
-  void _insertItem() {
-    _listData.insert(_listData.length, tempCounter++);
-    listKey.currentState?.insertItem(
-      _listData.length - 1,
-      duration: const Duration(milliseconds: 300),
-    );
-  }
+  // void _insertItem() {
+  //   _listData.insert(_listData.length, tempCounter++);
+  //   listKey.currentState?.insertItem(
+  //     _listData.length - 1,
+  //     duration: const Duration(milliseconds: 300),
+  //   );
+  // }
 
   Widget _itemBuilder(
     BuildContext context,
     int index,
     Animation<double> animation,
   ) {
-    int item = _listData[index];
+    Location location = _listData[index];
+
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(-1, 0),
         end: const Offset(0, 0),
       ).animate(animation),
       child: FadeTransition(
-        opacity: Tween<double>(
-          begin: 0,
-          end: 1,
-        ).animate(CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeIn,
-        )),
-        child: LocationListItem(
-          idx: index,
-          name: 'home $item',
-          latitude: '123.321231',
-          longitude: '90.43434',
-          alertOnArrive: true,
-          alertOnLeave: true,
-          onDeleteTapped: _onDeleteTapped,
-        ),
-      ),
+          opacity: Tween<double>(
+            begin: 0,
+            end: 1,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeIn,
+          )),
+          child: LocationListItem(
+            idx: index,
+            name: location.name,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            alertOnArrive: location.alertOnArrive,
+            alertOnLeave: location.alertOnLeave,
+            onDeleteTapped: _onDeleteTapped,
+          )),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget result = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [CircularProgressIndicator()],
+    return Consumer<User>(
+      builder: (context, user, child) {
+        if (!user.isReady) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [CircularProgressIndicator()],
+          );
+        }
+
+        _listData = user.locations;
+
+        return Expanded(
+          child: AnimatedList(
+            key: listKey,
+            initialItemCount: _listData.length,
+            itemBuilder: _itemBuilder,
+          ),
+        );
+      },
     );
-
-    if (!_isLoading) {
-      result = Expanded(
-        child: AnimatedList(
-          key: listKey,
-          initialItemCount: _listData.length,
-          itemBuilder: _itemBuilder,
-        ),
-      );
-    }
-
-    return result;
   }
 }
 

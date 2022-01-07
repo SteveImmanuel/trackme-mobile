@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
+import 'package:trackme_mobile/models/user.dart';
 
 class AliasListItem extends StatelessWidget {
   const AliasListItem({
@@ -43,9 +45,7 @@ class AliasList extends StatefulWidget {
 
 class _AliasListState extends State<AliasList> {
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
-  final List<int> _listData = [1, 2, 3, 4, 5];
-  bool _isLoading = false;
-  int tempCounter = 0;
+  late List<String> _listData;
 
   void _onConfirmDelete(BuildContext context, int idx) {
     // TODO: call api delete
@@ -78,20 +78,19 @@ class _AliasListState extends State<AliasList> {
     );
   }
 
-  void _reloadList() {
-    _listData.insert(_listData.length, tempCounter++);
-    listKey.currentState?.insertItem(
-      _listData.length - 1,
-      duration: const Duration(milliseconds: 300),
-    );
-  }
+  // void _reloadList() {
+  //   _listData.insert(_listData.length, tempCounter++);
+  //   listKey.currentState?.insertItem(
+  //     _listData.length - 1,
+  //     duration: const Duration(milliseconds: 300),
+  //   );
+  // }
 
   Widget _itemBuilder(
     BuildContext context,
     int index,
     Animation<double> animation,
   ) {
-    int item = _listData[index];
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(-1, 0),
@@ -107,7 +106,7 @@ class _AliasListState extends State<AliasList> {
         )),
         child: AliasListItem(
           idx: index,
-          name: 'Alias-$index',
+          name: _listData[index],
           onDeleteTapped: _onDeleteTapped,
         ),
       ),
@@ -116,22 +115,26 @@ class _AliasListState extends State<AliasList> {
 
   @override
   Widget build(BuildContext context) {
-    Widget result = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [CircularProgressIndicator()],
+    return Consumer<User>(
+      builder: (context, user, child) {
+        if (!user.isReady) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [CircularProgressIndicator()],
+          );
+        }
+
+        _listData = user.aliases;
+
+        return Expanded(
+          child: AnimatedList(
+            key: listKey,
+            initialItemCount: _listData.length,
+            itemBuilder: _itemBuilder,
+          ),
+        );
+      },
     );
-
-    if (!_isLoading) {
-      result = Expanded(
-        child: AnimatedList(
-          key: listKey,
-          initialItemCount: _listData.length,
-          itemBuilder: _itemBuilder,
-        ),
-      );
-    }
-
-    return result;
   }
 }
 
@@ -153,7 +156,7 @@ class Aliases extends StatelessWidget {
         ),
         SizedBox(height: 5),
         Text(
-          'Trackme Bot will recognize these aliases as you if any of them is mentioned in authorized chat channels',
+          'TrackMe Bot will recognize these aliases as you if any of them is mentioned in authorized chat channels',
         ),
         SizedBox(height: 5),
         AliasList(),
