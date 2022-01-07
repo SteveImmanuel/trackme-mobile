@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:trackme_mobile/utilities/custom_callback_types.dart';
 
 class BotChannelListItem extends StatelessWidget {
-  const BotChannelListItem(
-      {Key? key,
-      required this.name,
-      required this.type,
-      required this.photo_url,
-      required this.platform,
-      required this.idx})
-      : super(key: key);
+  const BotChannelListItem({
+    Key? key,
+    required this.name,
+    required this.type,
+    required this.photo_url,
+    required this.platform,
+    required this.idx,
+    required this.onDeleteTapped,
+  }) : super(key: key);
+
   final String name;
   final String type;
   final String platform;
   final String photo_url;
   final int idx;
+  final DeleteListItem onDeleteTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,17 @@ class BotChannelListItem extends StatelessWidget {
             Text(type),
           ],
         ),
-        trailing: const Icon(Icons.delete),
+        trailing: ClipOval(
+          child: Material(
+            child: InkWell(
+              child: const Padding(
+                padding: EdgeInsets.all(10),
+                child: Icon(Icons.delete),
+              ),
+              onTap: () => onDeleteTapped(context, idx),
+            ),
+          ),
+        ),
         onTap: () {},
       ),
     );
@@ -45,11 +59,42 @@ class _BotChannelListState extends State<BotChannelList> {
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
   final List<int> _listData = [1, 2, 3, 4, 5];
 
-  void _insertItem() {
+  void _reloadList() {
     _listData.insert(_listData.length, 1);
     listKey.currentState?.insertItem(
       _listData.length - 1,
       duration: const Duration(milliseconds: 300),
+    );
+  }
+
+  void _onConfirmDelete(BuildContext context, int idx) {
+    // TODO: call api delete
+    Navigator.pop(context);
+  }
+
+  void _onDeclineDelete(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  Future<void> _onDeleteTapped(BuildContext context, int idx) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Bot Channel'),
+          content: const Text('Are you sure you want to delete bot channel X?'),
+          actions: [
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () => _onConfirmDelete(context, idx),
+            ),
+            TextButton(
+              child: const Text('No'),
+              onPressed: () => _onDeclineDelete(context),
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -79,6 +124,7 @@ class _BotChannelListState extends State<BotChannelList> {
           photo_url: 'www.asd.asda',
           platform: 'line',
           type: 'User',
+          onDeleteTapped: _onDeleteTapped,
         ),
       ),
     );
@@ -152,7 +198,7 @@ class _BotChannelsState extends State<BotChannels> {
             'Give the token to people or groups that wants to track you and ask them to send /register <token> to the TrackMe bot.'),
         const SizedBox(height: 20),
         const Text(
-          'List of Authorized Channels',
+          'Authorized Channels',
           style: TextStyle(
             fontSize: 25,
           ),

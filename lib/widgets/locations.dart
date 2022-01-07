@@ -1,53 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:trackme_mobile/utilities/custom_callback_types.dart';
 
 class LocationListItem extends StatelessWidget {
-  const LocationListItem({
-    Key? key,
-    required this.name,
-    required this.latitude,
-    required this.longitude,
-    required this.alertOnLeave,
-    required this.alertOnArrive,
-    required this.id,
-  }) : super(key: key);
+  const LocationListItem(
+      {Key? key,
+      required this.name,
+      required this.latitude,
+      required this.longitude,
+      required this.alertOnLeave,
+      required this.alertOnArrive,
+      required this.idx,
+      required this.onDeleteTapped})
+      : super(key: key);
 
-  final String id;
+  final int idx;
   final String name;
   final String latitude;
   final String longitude;
   final bool alertOnLeave;
   final bool alertOnArrive;
-
-  void _onConfirmDelete(BuildContext context, String id) {
-    // TODO: call api delete
-    Navigator.pop(context);
-  }
-
-  void _onDeclineDelete(BuildContext context) {
-    Navigator.pop(context);
-  }
-
-  Future<void> _onDeleteTapped(BuildContext context, String id) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete Location'),
-          content: const Text('Are you sure you want to delete location X?'),
-          actions: [
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () => _onConfirmDelete(context, id),
-            ),
-            TextButton(
-              child: const Text('No'),
-              onPressed: () => _onDeclineDelete(context),
-            )
-          ],
-        );
-      },
-    );
-  }
+  final DeleteListItem onDeleteTapped;
 
   String _formatCoordinates(String coordinate) {
     return num.parse(coordinate).toStringAsFixed(3);
@@ -60,43 +32,64 @@ class LocationListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  Text(name),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
+      child: InkWell(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    IntrinsicHeight(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text('Latitude: ${_formatCoordinates(latitude)}'),
-                          Text(
-                              'Alert on Leave: ${_boolToString(alertOnLeave)}'),
+                          Column(
+                            children: [
+                              Text('Latitude: ${_formatCoordinates(latitude)}'),
+                              Text(
+                                  'Longitude: ${_formatCoordinates(longitude)}'),
+                            ],
+                          ),
+                          const VerticalDivider(
+                            thickness: 1,
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                  'Alert on Leave: ${_boolToString(alertOnLeave)}'),
+                              Text(
+                                  'Alert on Arrive: ${_boolToString(alertOnArrive)}'),
+                            ],
+                          ),
                         ],
                       ),
-                      VerticalDivider(width: 10,thickness: 4,),
-                      Column(
-                        children: [
-                          Text('Longitude: ${_formatCoordinates(longitude)}'),
-                          Text(
-                              'Alert on Arrive: ${_boolToString(alertOnArrive)}'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(10),
-              child: Icon(Icons.delete),
-            )
-          ],
+              ClipOval(
+                child: Material(
+                  child: InkWell(
+                    child: const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Icon(Icons.delete),
+                    ),
+                    onTap: () => onDeleteTapped(context, idx),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
+        onTap: () {},
       ),
     );
   }
@@ -114,6 +107,37 @@ class _LocationListState extends State<LocationList> {
   final List<int> _listData = [];
   int tempCounter = 0;
   bool _isLoading = true;
+
+  void _onConfirmDelete(BuildContext context, int idx) {
+    // TODO: call api delete
+    Navigator.pop(context);
+  }
+
+  void _onDeclineDelete(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  Future<void> _onDeleteTapped(BuildContext context, int idx) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Location'),
+          content: const Text('Are you sure you want to delete location X?'),
+          actions: [
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () => _onConfirmDelete(context, idx),
+            ),
+            TextButton(
+              child: const Text('No'),
+              onPressed: () => _onDeclineDelete(context),
+            )
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> TestSleep() async {
     await Future.delayed(const Duration(milliseconds: 1000));
@@ -162,12 +186,13 @@ class _LocationListState extends State<LocationList> {
           curve: Curves.easeIn,
         )),
         child: LocationListItem(
-          id: index.toString(),
+          idx: index,
           name: 'home $item',
           latitude: '123.321231',
           longitude: '90.43434',
           alertOnArrive: true,
           alertOnLeave: true,
+          onDeleteTapped: _onDeleteTapped,
         ),
       ),
     );
@@ -191,12 +216,6 @@ class _LocationListState extends State<LocationList> {
     }
 
     return result;
-
-    // return AnimatedList(
-    //   key: listKey,
-    //   initialItemCount: _listData.length,
-    //   itemBuilder: _itemBuilder,
-    // );
   }
 }
 
@@ -207,9 +226,16 @@ class Locations extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: const [
-        Text('Below is a list of your highlighted locations'),
+        SizedBox(height: 20),
+        Text(
+          'Your Highlighted Locations',
+          style: TextStyle(
+            fontSize: 25,
+          ),
+        ),
+        SizedBox(height: 5),
         LocationList(),
       ],
     );
