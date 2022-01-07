@@ -42,7 +42,7 @@ class BotChannelListItem extends StatelessWidget {
             ),
           ),
         ),
-        onTap: () {},
+        onTap: null,
       ),
     );
   }
@@ -195,7 +195,7 @@ class _BotChannelsState extends State<BotChannels> {
               : const Icon(Icons.refresh),
         ),
         const Text(
-            'Give the token to people or groups that wants to track you and ask them to send /register <token> to the TrackMe bot.'),
+            'Give the token to people or groups that want to track you and ask them to send /register <token> to the TrackMe bot.'),
         const SizedBox(height: 20),
         const Text(
           'Authorized Channels',
