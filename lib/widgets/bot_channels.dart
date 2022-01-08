@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
 import 'package:trackme_mobile/models/user.dart';
 import 'package:trackme_mobile/models/bot_channel.dart';
+import 'package:trackme_mobile/widgets/custom_animated_list.dart';
 
 class BotChannelListItem extends StatelessWidget {
   const BotChannelListItem({
@@ -41,7 +42,6 @@ class BotChannelListItem extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
               Image.asset(
                 'assets/images/$icon',
                 scale: 5.5,
@@ -58,7 +58,7 @@ class BotChannelListItem extends StatelessWidget {
                 padding: EdgeInsets.all(10),
                 child: Icon(Icons.delete),
               ),
-              onTap: () => onDeleteTapped(context, idx),
+              onTap: () => onDeleteTapped(context, idx, name),
             ),
           ),
         ),
@@ -68,110 +68,36 @@ class BotChannelListItem extends StatelessWidget {
   }
 }
 
-class BotChannelList extends StatefulWidget {
-  const BotChannelList({Key? key}) : super(key: key);
+class BotChannelList extends CustomAnimatedList {
+  const BotChannelList({Key? key}) : super(key: key, type: 'Bot Channel');
 
   @override
   _BotChannelListState createState() => _BotChannelListState();
 }
 
-class _BotChannelListState extends State<BotChannelList> {
-  final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
-  late List<BotChannel> _listData = [];
-
-  // void _reloadList() {
-  //   _listData.insert(_listData.length, 1);
-  //   listKey.currentState?.insertItem(
-  //     _listData.length - 1,
-  //     duration: const Duration(milliseconds: 300),
-  //   );
-  // }
-
-  void _onConfirmDelete(BuildContext context, int idx) {
-    // TODO: call api delete
-    Navigator.pop(context);
+class _BotChannelListState extends CustomAnimatedListState<BotChannelList> {
+  @override
+  void onConfirmDelete(BuildContext context, int idx) {
+    // TODO: implement onConfirmDelete
+    super.onConfirmDelete(context, idx);
   }
 
-  void _onDeclineDelete(BuildContext context) {
-    Navigator.pop(context);
-  }
-
-  Future<void> _onDeleteTapped(BuildContext context, int idx) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete Bot Channel'),
-          content: const Text('Are you sure you want to delete bot channel X?'),
-          actions: [
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () => _onConfirmDelete(context, idx),
-            ),
-            TextButton(
-              child: const Text('No'),
-              onPressed: () => _onDeclineDelete(context),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _itemBuilder(
+  @override
+  Widget itemBuilder(
     BuildContext context,
     int index,
     Animation<double> animation,
   ) {
-    BotChannel channel = _listData[index];
-
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(-1, 0),
-        end: const Offset(0, 0),
-      ).animate(animation),
-      child: FadeTransition(
-        opacity: Tween<double>(
-          begin: 0,
-          end: 1,
-        ).animate(CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeIn,
-        )),
-        child: BotChannelListItem(
-          idx: index,
-          name: channel.displayName,
-          photoUrl: channel.photoUrl,
-          platform: channel.platform,
-          type: 'User',
-          onDeleteTapped: _onDeleteTapped,
-        ),
-      ),
+    BotChannel channel = listData[index] as BotChannel;
+    Widget child = BotChannelListItem(
+      idx: index,
+      name: channel.displayName,
+      photoUrl: channel.photoUrl,
+      platform: channel.platform,
+      type: 'User',
+      onDeleteTapped: onDeleteTapped,
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<User>(
-      builder: (context, user, child) {
-        if (!user.isReady) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [CircularProgressIndicator()],
-          );
-        }
-
-        _listData = user.botChannels;
-
-        return Expanded(
-          child: AnimatedList(
-            key: listKey,
-            initialItemCount: _listData.length,
-            itemBuilder: _itemBuilder,
-          ),
-        );
-      },
-    );
+    return baseItemBuilder(context, index, animation, child);
   }
 }
 

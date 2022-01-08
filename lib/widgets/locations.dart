@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/models/user.dart';
+import 'package:trackme_mobile/widgets/custom_animated_list.dart';
 import 'package:trackme_mobile/models/location.dart';
 
 class LocationListItem extends StatelessWidget {
@@ -85,7 +84,7 @@ class LocationListItem extends StatelessWidget {
                       padding: EdgeInsets.all(10),
                       child: Icon(Icons.delete),
                     ),
-                    onTap: () => onDeleteTapped(context, idx),
+                    onTap: () => onDeleteTapped(context, idx, name),
                   ),
                 ),
               )
@@ -98,110 +97,37 @@ class LocationListItem extends StatelessWidget {
   }
 }
 
-class LocationList extends StatefulWidget {
-  const LocationList({Key? key}) : super(key: key);
+class LocationList extends CustomAnimatedList {
+  const LocationList({Key? key}) : super(key: key, type: 'Location');
 
   @override
   _LocationListState createState() => _LocationListState();
 }
 
-class _LocationListState extends State<LocationList> {
-  final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
-  late List<Location> _listData = [];
-
-  void _onConfirmDelete(BuildContext context, int idx) {
-    // TODO: call api delete
-    Navigator.pop(context);
+class _LocationListState extends CustomAnimatedListState<LocationList> {
+  @override
+  void onConfirmDelete(BuildContext context, int idx) {
+    // TODO: implement onConfirmDelete
+    super.onConfirmDelete(context, idx);
   }
 
-  void _onDeclineDelete(BuildContext context) {
-    Navigator.pop(context);
-  }
-
-  Future<void> _onDeleteTapped(BuildContext context, int idx) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete Location'),
-          content: const Text('Are you sure you want to delete location X?'),
-          actions: [
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () => _onConfirmDelete(context, idx),
-            ),
-            TextButton(
-              child: const Text('No'),
-              onPressed: () => _onDeclineDelete(context),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  // void _insertItem() {
-  //   _listData.insert(_listData.length, tempCounter++);
-  //   listKey.currentState?.insertItem(
-  //     _listData.length - 1,
-  //     duration: const Duration(milliseconds: 300),
-  //   );
-  // }
-
-  Widget _itemBuilder(
+  @override
+  Widget itemBuilder(
     BuildContext context,
     int index,
     Animation<double> animation,
   ) {
-    Location location = _listData[index];
-
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(-1, 0),
-        end: const Offset(0, 0),
-      ).animate(animation),
-      child: FadeTransition(
-          opacity: Tween<double>(
-            begin: 0,
-            end: 1,
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeIn,
-          )),
-          child: LocationListItem(
-            idx: index,
-            name: location.name,
-            latitude: location.latitude,
-            longitude: location.longitude,
-            alertOnArrive: location.alertOnArrive,
-            alertOnLeave: location.alertOnLeave,
-            onDeleteTapped: _onDeleteTapped,
-          )),
+    Location location = listData[index] as Location;
+    Widget child = LocationListItem(
+      idx: index,
+      name: location.name,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      alertOnArrive: location.alertOnArrive,
+      alertOnLeave: location.alertOnLeave,
+      onDeleteTapped: onDeleteTapped,
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<User>(
-      builder: (context, user, child) {
-        if (!user.isReady) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [CircularProgressIndicator()],
-          );
-        }
-
-        _listData = user.locations;
-
-        return Expanded(
-          child: AnimatedList(
-            key: listKey,
-            initialItemCount: _listData.length,
-            itemBuilder: _itemBuilder,
-          ),
-        );
-      },
-    );
+    return baseItemBuilder(context, index, animation, child);
   }
 }
 

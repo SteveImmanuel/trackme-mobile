@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/models/user.dart';
+import 'package:trackme_mobile/widgets/custom_animated_list.dart';
 
 class AliasListItem extends StatelessWidget {
   const AliasListItem({
@@ -27,7 +26,7 @@ class AliasListItem extends StatelessWidget {
                 padding: EdgeInsets.all(10),
                 child: Icon(Icons.delete),
               ),
-              onTap: () => onDeleteTapped(context, idx),
+              onTap: () => onDeleteTapped(context, idx, name),
             ),
           ),
         ),
@@ -36,105 +35,33 @@ class AliasListItem extends StatelessWidget {
   }
 }
 
-class AliasList extends StatefulWidget {
-  const AliasList({Key? key}) : super(key: key);
+class AliasList extends CustomAnimatedList {
+  const AliasList({Key? key}) : super(key: key, type: 'Alias');
 
   @override
   _AliasListState createState() => _AliasListState();
 }
 
-class _AliasListState extends State<AliasList> {
-  final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
-  late List<String> _listData;
-
-  void _onConfirmDelete(BuildContext context, int idx) {
-    // TODO: call api delete
-    Navigator.pop(context);
+class _AliasListState extends CustomAnimatedListState<AliasList> {
+  @override
+  void onConfirmDelete(BuildContext context, int idx) {
+    // TODO: implement onConfirmDelete
+    super.onConfirmDelete(context, idx);
   }
 
-  void _onDeclineDelete(BuildContext context) {
-    Navigator.pop(context);
-  }
-
-  Future<void> _onDeleteTapped(BuildContext context, int idx) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete Alias'),
-          content: const Text('Are you sure you want to delete alias X?'),
-          actions: [
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () => _onConfirmDelete(context, idx),
-            ),
-            TextButton(
-              child: const Text('No'),
-              onPressed: () => _onDeclineDelete(context),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  // void _reloadList() {
-  //   _listData.insert(_listData.length, tempCounter++);
-  //   listKey.currentState?.insertItem(
-  //     _listData.length - 1,
-  //     duration: const Duration(milliseconds: 300),
-  //   );
-  // }
-
-  Widget _itemBuilder(
+  @override
+  Widget itemBuilder(
     BuildContext context,
     int index,
     Animation<double> animation,
   ) {
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(-1, 0),
-        end: const Offset(0, 0),
-      ).animate(animation),
-      child: FadeTransition(
-        opacity: Tween<double>(
-          begin: 0,
-          end: 1,
-        ).animate(CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeIn,
-        )),
-        child: AliasListItem(
-          idx: index,
-          name: _listData[index],
-          onDeleteTapped: _onDeleteTapped,
-        ),
-      ),
+    String alias = listData[index] as String;
+    Widget child = AliasListItem(
+      idx: index,
+      name: alias,
+      onDeleteTapped: onDeleteTapped,
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<User>(
-      builder: (context, user, child) {
-        if (!user.isReady) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [CircularProgressIndicator()],
-          );
-        }
-
-        _listData = user.aliases;
-
-        return Expanded(
-          child: AnimatedList(
-            key: listKey,
-            initialItemCount: _listData.length,
-            itemBuilder: _itemBuilder,
-          ),
-        );
-      },
-    );
+    return baseItemBuilder(context, index, animation, child);
   }
 }
 
