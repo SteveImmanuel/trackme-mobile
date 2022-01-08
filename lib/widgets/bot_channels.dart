@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/models/user.dart';
 import 'package:trackme_mobile/models/bot_channel.dart';
 import 'package:trackme_mobile/widgets/custom_animated_list.dart';
 
@@ -47,7 +45,7 @@ class BotChannelListItem extends StatelessWidget {
                 scale: 5.5,
               ),
               const SizedBox(width: 5),
-              Text('${type[0].toUpperCase()}${type.substring(1)}'),
+              Text(type),
             ],
           ),
         ),
@@ -152,8 +150,16 @@ class _BotChannelsState extends State<BotChannels> {
                 )
               : const Icon(Icons.refresh),
         ),
-        const Text(
-            'Give this token to people or groups that want to track you and ask them to send /register <token> to the TrackMe bot.'),
+        RichText(
+          text: TextSpan(
+              style: DefaultTextStyle.of(context).style,
+              text:
+                  'Give this token to people or groups that want to track you and ask them to send ',
+              children: const [
+                TextSpan(text: '/register <token>', style: TextStyle(fontFamily: 'RobotoMono', backgroundColor: Colors.black12)),
+                TextSpan(text: ' to the TrackMe bot')
+              ]),
+        ),
         const SizedBox(height: 20),
         const Text(
           'Authorized Channels',

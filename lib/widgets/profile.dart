@@ -34,7 +34,7 @@ class _ProfileState extends State<Profile> {
         Consumer<User>(
           builder: (context, user, child) {
             return Text(
-              'Hello, ${user.username}',
+              'Hello, ${user.username.toUpperCase()}',
               style: TextStyle(fontSize: 35),
             );
           },
