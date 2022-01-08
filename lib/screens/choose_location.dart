@@ -133,6 +133,8 @@ class _MapState extends State<Map> {
 }
 
 class ChooseLocation extends StatefulWidget {
+  static String route = '/location';
+
   final double? latitude;
   final double? longitude;
 
