@@ -144,7 +144,10 @@ class _BotChannelsState extends State<BotChannels> {
           onPressed: _isGeneratingToken ? null : _generateNewToken,
           child: _isGeneratingToken
               ? const SizedBox(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.black45,
+                  ),
                   height: 15,
                   width: 15,
                 )
@@ -156,7 +159,12 @@ class _BotChannelsState extends State<BotChannels> {
               text:
                   'Give this token to people or groups that want to track you and ask them to send ',
               children: const [
-                TextSpan(text: '/register <token>', style: TextStyle(fontFamily: 'RobotoMono', backgroundColor: Colors.black12)),
+                TextSpan(
+                  text: '/register <token>',
+                  style: TextStyle(
+                      fontFamily: 'RobotoMono',
+                      backgroundColor: Colors.black12),
+                ),
                 TextSpan(text: ' to the TrackMe bot')
               ]),
         ),

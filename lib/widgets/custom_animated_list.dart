@@ -82,9 +82,12 @@ class CustomAnimatedListState<T extends CustomAnimatedList> extends State<T> {
     return Consumer<User>(
       builder: (context, user, child) {
         if (!user.isReady) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [CircularProgressIndicator()],
+          return Padding(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [CircularProgressIndicator()],
+            ),
+            padding: const EdgeInsets.only(top: 15),
           );
         }
 
