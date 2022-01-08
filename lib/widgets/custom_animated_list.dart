@@ -33,13 +33,13 @@ class CustomAnimatedListState<T extends CustomAnimatedList> extends State<T> {
               'Are you sure you want to delete ${widget.type.toLowerCase()} $name?'),
           actions: [
             TextButton(
+              child: const Text('No'),
+              onPressed: () => onDeclineDelete(context),
+            ),
+            TextButton(
               child: const Text('Yes'),
               onPressed: () => onConfirmDelete(context, idx),
             ),
-            TextButton(
-              child: const Text('No'),
-              onPressed: () => onDeclineDelete(context),
-            )
           ],
         );
       },
@@ -93,13 +93,18 @@ class CustomAnimatedListState<T extends CustomAnimatedList> extends State<T> {
 
         listData = user.getListPropertyByString(widget.type);
 
-        return Expanded(
-          child: AnimatedList(
-            key: listKey,
-            initialItemCount: listData.length,
-            itemBuilder: itemBuilder,
-          ),
-        );
+        if (listData.length > 0) {
+          return Expanded(
+            child: AnimatedList(
+              key: listKey,
+              initialItemCount: listData.length,
+              itemBuilder: itemBuilder,
+            ),
+          );
+        }
+
+        return Expanded(child:Text('Once you add ${widget.type.toLowerCase()}, it will be shown here'));
+
       },
     );
   }
