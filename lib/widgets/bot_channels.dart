@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
+import 'package:trackme_mobile/models/user.dart';
+import 'package:trackme_mobile/models/bot_channel.dart';
 
 class BotChannelListItem extends StatelessWidget {
   const BotChannelListItem({
     Key? key,
     required this.name,
     required this.type,
-    required this.photo_url,
+    required this.photoUrl,
     required this.platform,
     required this.idx,
     required this.onDeleteTapped,
@@ -15,21 +18,38 @@ class BotChannelListItem extends StatelessWidget {
   final String name;
   final String type;
   final String platform;
-  final String photo_url;
+  final String photoUrl;
   final int idx;
   final DeleteListItem onDeleteTapped;
 
   @override
   Widget build(BuildContext context) {
+    String icon = 'line_icon.png';
+    if (platform == 'telegram') {
+      icon = 'telegram_icon.png';
+    }
+
     return Card(
       child: ListTile(
-        leading: Icon(Icons.circle),
+        leading: CircleAvatar(
+          radius: 20,
+          backgroundImage: NetworkImage(photoUrl),
+        ),
         title: Text(name),
-        subtitle: Row(
-          children: [
-            Icon(Icons.person),
-            Text(type),
-          ],
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+
+              Image.asset(
+                'assets/images/$icon',
+                scale: 5.5,
+              ),
+              const SizedBox(width: 5),
+              Text('${type[0].toUpperCase()}${type.substring(1)}'),
+            ],
+          ),
         ),
         trailing: ClipOval(
           child: Material(
@@ -57,15 +77,15 @@ class BotChannelList extends StatefulWidget {
 
 class _BotChannelListState extends State<BotChannelList> {
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
-  final List<int> _listData = [1, 2, 3, 4, 5];
+  late List<BotChannel> _listData = [];
 
-  void _reloadList() {
-    _listData.insert(_listData.length, 1);
-    listKey.currentState?.insertItem(
-      _listData.length - 1,
-      duration: const Duration(milliseconds: 300),
-    );
-  }
+  // void _reloadList() {
+  //   _listData.insert(_listData.length, 1);
+  //   listKey.currentState?.insertItem(
+  //     _listData.length - 1,
+  //     duration: const Duration(milliseconds: 300),
+  //   );
+  // }
 
   void _onConfirmDelete(BuildContext context, int idx) {
     // TODO: call api delete
@@ -103,7 +123,7 @@ class _BotChannelListState extends State<BotChannelList> {
     int index,
     Animation<double> animation,
   ) {
-    int item = _listData[index];
+    BotChannel channel = _listData[index];
 
     return SlideTransition(
       position: Tween<Offset>(
@@ -120,9 +140,9 @@ class _BotChannelListState extends State<BotChannelList> {
         )),
         child: BotChannelListItem(
           idx: index,
-          name: 'Channel $item',
-          photo_url: 'www.asd.asda',
-          platform: 'line',
+          name: channel.displayName,
+          photoUrl: channel.photoUrl,
+          platform: channel.platform,
           type: 'User',
           onDeleteTapped: _onDeleteTapped,
         ),
@@ -132,14 +152,26 @@ class _BotChannelListState extends State<BotChannelList> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: AnimatedList(
-        key: listKey,
-        initialItemCount: _listData.length,
-        itemBuilder: _itemBuilder,
-      ),
+    return Consumer<User>(
+      builder: (context, user, child) {
+        if (!user.isReady) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [CircularProgressIndicator()],
+          );
+        }
+
+        _listData = user.botChannels;
+
+        return Expanded(
+          child: AnimatedList(
+            key: listKey,
+            initialItemCount: _listData.length,
+            itemBuilder: _itemBuilder,
+          ),
+        );
+      },
     );
-    ;
   }
 }
 
@@ -195,7 +227,7 @@ class _BotChannelsState extends State<BotChannels> {
               : const Icon(Icons.refresh),
         ),
         const Text(
-            'Give the token to people or groups that want to track you and ask them to send /register <token> to the TrackMe bot.'),
+            'Give this token to people or groups that want to track you and ask them to send /register <token> to the TrackMe bot.'),
         const SizedBox(height: 20),
         const Text(
           'Authorized Channels',
