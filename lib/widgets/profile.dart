@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:trackme_mobile/models/user.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -33,9 +34,24 @@ class _ProfileState extends State<Profile> {
         const Spacer(flex: 1),
         Consumer<User>(
           builder: (context, user, child) {
-            return Text(
-              'Hello, ${user.username.toUpperCase()}',
-              style: TextStyle(fontSize: 35),
+            Widget child = Container();
+            if (user.isReady) {
+              child = AnimatedTextKit(
+                animatedTexts: [
+                  TypewriterAnimatedText(
+                    'Hello, ${user.username.toUpperCase()}',
+                    textStyle: const TextStyle(
+                      fontSize: 35,
+                    ),
+                    speed: const Duration(milliseconds: 200),
+                  ),
+                ],
+                totalRepeatCount: 1,
+              );
+            }
+            return SizedBox(
+              child: child,
+              height: 40,
             );
           },
         ),
