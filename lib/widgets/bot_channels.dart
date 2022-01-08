@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
 import 'package:trackme_mobile/models/bot_channel.dart';
 import 'package:trackme_mobile/widgets/custom_animated_list.dart';
+import 'package:trackme_mobile/utilities/api.dart';
 
 class BotChannelListItem extends StatelessWidget {
   const BotChannelListItem({
@@ -107,18 +108,20 @@ class BotChannels extends StatefulWidget {
 }
 
 class _BotChannelsState extends State<BotChannels> {
-  String _token = '1234';
+  String _token = '-';
   bool _isGeneratingToken = false;
 
   Future<void> _generateNewToken() async {
     setState(() {
       _isGeneratingToken = true;
     });
-    await Future.delayed(Duration(seconds: 1));
-    setState(() {
-      _isGeneratingToken = false;
-      _token = (num.parse(_token) + 5).toString();
-    });
+    Map<String, dynamic> tokenResult = await generateBotToken();
+    if (tokenResult['code'] == 200) {
+      setState(() {
+        _isGeneratingToken = false;
+        _token = tokenResult['detail']['token'];
+      });
+    }
   }
 
   @override

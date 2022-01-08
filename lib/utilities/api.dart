@@ -141,3 +141,7 @@ Future<Map<String, dynamic>> getUserData() {
 Future<Map<String, dynamic>> updateAlias(Map<String, dynamic> body) {
   return postAuthenticated('$apiUrl/user', body, isPut: true);
 }
+
+Future<Map<String, dynamic>> generateBotToken() {
+  return postAuthenticated('$apiUrl/bot/token', {});
+}
