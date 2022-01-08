@@ -139,16 +139,21 @@ class Locations extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: const [
-        SizedBox(height: 20),
-        Text(
-          'Your Highlighted Locations',
-          style: TextStyle(
-            fontSize: 25,
-          ),
+      children: [
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              'Your Highlighted Locations',
+              style: TextStyle(
+                fontSize: 25,
+              ),
+            ),
+          ],
         ),
-        SizedBox(height: 5),
-        LocationList(),
+        const SizedBox(height: 5),
+        const LocationList(),
       ],
     );
   }
