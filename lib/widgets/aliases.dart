@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
 import 'package:trackme_mobile/widgets/custom_animated_list.dart';
+import 'package:trackme_mobile/utilities/api.dart';
 
 class AliasListItem extends StatelessWidget {
   const AliasListItem({
@@ -36,7 +37,10 @@ class AliasListItem extends StatelessWidget {
 }
 
 class AliasList extends CustomAnimatedList {
-  const AliasList({Key? key}) : super(key: key, type: 'Alias');
+  final VoidCallback reloadUserData;
+
+  const AliasList({Key? key, required this.reloadUserData})
+      : super(key: key, type: 'Alias');
 
   @override
   _AliasListState createState() => _AliasListState();
@@ -44,9 +48,12 @@ class AliasList extends CustomAnimatedList {
 
 class _AliasListState extends CustomAnimatedListState<AliasList> {
   @override
-  void onConfirmDelete(BuildContext context, int idx) {
-    // TODO: implement onConfirmDelete
+  Future<void> onConfirmDelete(BuildContext context, int idx) async {
+    await updateAlias({
+      'aliases': [...listData.sublist(0, idx), ...listData.sublist(idx + 1)],
+    });
     super.onConfirmDelete(context, idx);
+    widget.reloadUserData();
   }
 
   @override
@@ -56,6 +63,7 @@ class _AliasListState extends CustomAnimatedListState<AliasList> {
     Animation<double> animation,
   ) {
     String alias = listData[index] as String;
+
     Widget child = AliasListItem(
       idx: index,
       name: alias,
@@ -66,27 +74,29 @@ class _AliasListState extends CustomAnimatedListState<AliasList> {
 }
 
 class Aliases extends StatelessWidget {
-  const Aliases({Key? key}) : super(key: key);
+  final VoidCallback reloadUserData;
+
+  const Aliases({Key? key, required this.reloadUserData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: const [
-        SizedBox(height: 20),
-        Text(
+      children: [
+        const SizedBox(height: 20),
+        const Text(
           'Your Aliases',
           style: TextStyle(
             fontSize: 25,
           ),
         ),
-        SizedBox(height: 5),
-        Text(
+        const SizedBox(height: 5),
+        const Text(
           'TrackMe Bot will recognize these aliases as you if any of them is mentioned in the authorized chat channels',
         ),
-        SizedBox(height: 5),
-        AliasList(),
+        const SizedBox(height: 5),
+        AliasList(reloadUserData: reloadUserData),
       ],
     );
   }
