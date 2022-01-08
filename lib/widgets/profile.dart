@@ -103,6 +103,10 @@ class _ProfileState extends State<Profile> {
             const Text('minutes'),
           ],
         ),
+        ElevatedButton(
+          onPressed: () {},
+          child: const Text('POST NOW'),
+        ),
         const Spacer(flex: 5),
       ],
     );
