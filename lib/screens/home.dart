@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:trackme_mobile/constants.dart';
 import 'package:trackme_mobile/widgets/bot_channels.dart';
 import 'package:trackme_mobile/widgets/locations.dart';
 import 'package:trackme_mobile/widgets/profile.dart';
@@ -71,10 +71,7 @@ class _HomeState extends State<Home> {
     }""";
 
     Map<String, dynamic> decodedData = jsonDecode(data);
-    print('a');
     _user.setData(decodedData);
-    print('b');
-
   }
 
   @override
@@ -83,10 +80,12 @@ class _HomeState extends State<Home> {
       create: (context) => _user,
       child: Scaffold(
         appBar: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Theme.of(context).appBarTheme.backgroundColor,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+          ),
           title: Text(_children[_currentIndex].title),
-          backgroundColor: AppColor.primary,
-          foregroundColor: AppColor.text,
-          elevation: 0,
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -124,9 +123,9 @@ class _HomeState extends State<Home> {
         ),
         floatingActionButton: (_currentIndex == 2 || _currentIndex == 3)
             ? FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: _getUserData,
-        )
+                child: const Icon(Icons.add),
+                onPressed: _getUserData,
+              )
             : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),

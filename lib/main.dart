@@ -7,6 +7,20 @@ void main() {
   runApp(const MainApp());
 }
 
+final ThemeData theme = ThemeData (
+  colorScheme: ColorScheme.fromSwatch(
+    primarySwatch: Colors.indigo,
+    accentColor: Colors.amber,
+    backgroundColor: Colors.white
+  ),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.white,
+    foregroundColor: Colors.black,
+    elevation: 0
+  ),
+  scaffoldBackgroundColor: Colors.white
+);
+
 class MainApp extends StatelessWidget {
   const MainApp({Key? key}) : super(key: key);
 
@@ -14,7 +28,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return  MaterialApp(
       home: const Home(),
-      theme: ThemeData(fontFamily: 'Roboto'),
+      theme: theme,
     );
   }
 }
