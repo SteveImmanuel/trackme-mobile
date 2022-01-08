@@ -156,7 +156,7 @@ class Aliases extends StatelessWidget {
         ),
         SizedBox(height: 5),
         Text(
-          'TrackMe Bot will recognize these aliases as you if any of them is mentioned in authorized chat channels',
+          'TrackMe Bot will recognize these aliases as you if any of them is mentioned in the authorized chat channels',
         ),
         SizedBox(height: 5),
         AliasList(),

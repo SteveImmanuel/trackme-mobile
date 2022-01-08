@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:trackme_mobile/models/user.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -8,7 +10,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  String _username = 'Steve';
   final List<bool> _isActive = [false];
   final List<int> _postIntervalList = [2, 5, 10, 15, 30, 60];
   int postInterval = 10;
@@ -30,14 +31,18 @@ class _ProfileState extends State<Profile> {
     return Column(
       children: [
         const Spacer(flex: 1),
-        Text(
-          'Hello, $_username',
-          style: TextStyle(fontSize: 35),
+        Consumer<User>(
+          builder: (context, user, child) {
+            return Text(
+              'Hello, ${user.username}',
+              style: TextStyle(fontSize: 35),
+            );
+          },
         ),
         const Divider(
           thickness: 1,
         ),
-        const Spacer(flex: 3),
+        const Spacer(flex: 5),
         Text(
           _isActive[0] ? 'ON' : 'OFF',
           style: const TextStyle(
@@ -82,7 +87,7 @@ class _ProfileState extends State<Profile> {
             const Text('minutes'),
           ],
         ),
-        const Spacer(flex: 3),
+        const Spacer(flex: 5),
       ],
     );
   }
