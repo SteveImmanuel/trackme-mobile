@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import 'package:trackme_mobile/widgets/locations.dart';
 import 'package:trackme_mobile/widgets/profile.dart';
 import 'package:trackme_mobile/widgets/aliases.dart';
 import 'package:trackme_mobile/models/user.dart';
+import 'package:trackme_mobile/utilities/api.dart';
 
 class ChildItem {
   String title;
@@ -20,6 +20,8 @@ class ChildItem {
 class LocationListController {}
 
 class Home extends StatefulWidget {
+  static String route = '/home';
+
   const Home({Key? key}) : super(key: key);
 
   @override
@@ -28,13 +30,22 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
-  final List<ChildItem> _children = [
-    ChildItem(title: 'Profile', widget: const Profile()),
-    ChildItem(title: 'Bot Channels', widget: const BotChannels()),
-    ChildItem(title: 'Locations', widget: const Locations()),
-    ChildItem(title: 'Aliases', widget: const Aliases()),
-  ];
-  User _user = User();
+  String _newAlias = '';
+  final User _user = User();
+  late List<ChildItem> _children;
+
+  @override
+  void initState() {
+    super.initState();
+    _children = [
+      ChildItem(title: 'Profile', widget: const Profile()),
+      ChildItem(title: 'Bot Channels', widget: const BotChannels()),
+      ChildItem(title: 'Locations', widget: const Locations()),
+      ChildItem(
+          title: 'Aliases', widget: Aliases(reloadUserData: _loadUserData)),
+    ];
+    _loadUserData();
+  }
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -42,36 +53,56 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Future<void> _getUserData() async {
-    String data = """
-    {
-      "_id" : "61d008e31e6c15e5041e2690",
-      "username" : "steve",
-      "aliases" : [ 
-          "andre"
-      ],
-      "bot_channels" : [ 
-          {
-              "id" : "Ud5ca5aec6ec7590de530ce4c50ed5708",
-              "type" : "user",
-              "photo_url" : "https://sprofile.line-scdn.net/0hNJSrz-PaEWV-Czkj0FZvGg5bEg9dekh3WmVfBkNYH1BLbF5nVW9fAUhcHVAWPFZgUm0OUE9YH1dyGGYDYF3tUXk7T1JHPFA1UWlWhQ",
-              "display_name" : "Steve Immanuel",
-              "platform": "line"
-          }
-      ],
-      "locations" : [ 
-          {
-              "latitude" : "-7.711653",
-              "longitude" : "110.599637",
-              "name" : "Home",
-              "alert_on_leave" : true,
-              "alert_on_arrive" : true
-          }
-      ]
-    }""";
+  Future<void> _loadUserData() async {
+    _user.setNotReady();
+    Map<String, dynamic> result = await getUserData();
+    if (result['code'] == 200) {
+      _user.setData(result['detail']);
+    } else {
+      // Push to login, show snack bar session timeout
+    }
+  }
 
-    Map<String, dynamic> decodedData = jsonDecode(data);
-    _user.setData(decodedData);
+  Future<void> _onAddButtonTapped(BuildContext context) async {
+    if (_currentIndex == 3) {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Add New Alias'),
+            content: TextField(
+              onChanged: (value) {
+                _newAlias = value;
+              },
+              decoration: const InputDecoration(
+                hintText: "Case sensitive, not empty",
+                isDense: true,
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              TextButton(
+                child: const Text('Add'),
+                onPressed: () async {
+                  if (_newAlias != '') {
+                    await updateAlias({
+                      'aliases': [_newAlias, ..._user.aliases],
+                    });
+                    await _loadUserData();
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    // return null;
   }
 
   @override
@@ -124,10 +155,11 @@ class _HomeState extends State<Home> {
         floatingActionButton: (_currentIndex == 2 || _currentIndex == 3)
             ? FloatingActionButton(
                 child: const Icon(Icons.add),
-                onPressed: _getUserData,
+                onPressed: () => _onAddButtonTapped(context),
               )
             : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        resizeToAvoidBottomInset: false,
       ),
     );
   }
