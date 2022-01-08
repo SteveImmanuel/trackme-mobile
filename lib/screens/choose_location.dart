@@ -99,7 +99,7 @@ class _MapState extends State<Map> {
                   padding: EdgeInsets.all(10),
                   child: Icon(Icons.arrow_back),
                 ),
-                onTap: (){},
+                onTap: () => Navigator.pop(context),
               ),
             ),
           ),

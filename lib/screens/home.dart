@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +8,7 @@ import 'package:trackme_mobile/widgets/profile.dart';
 import 'package:trackme_mobile/widgets/aliases.dart';
 import 'package:trackme_mobile/models/user.dart';
 import 'package:trackme_mobile/utilities/api.dart';
+import 'package:trackme_mobile/main.dart';
 
 class ChildItem {
   String title;
@@ -100,6 +100,8 @@ class _HomeState extends State<Home> {
           );
         },
       );
+    } else {
+      MainApp.navKey.currentState?.pushNamed('/location');
     }
 
     // return null;
