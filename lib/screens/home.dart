@@ -2,12 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:trackme_mobile/screens/choose_location.dart';
 import 'package:trackme_mobile/widgets/bot_channels.dart';
 import 'package:trackme_mobile/widgets/locations.dart';
 import 'package:trackme_mobile/widgets/profile.dart';
 import 'package:trackme_mobile/widgets/aliases.dart';
 import 'package:trackme_mobile/models/user.dart';
 import 'package:trackme_mobile/utilities/api.dart';
+import 'package:trackme_mobile/utilities/route_arguments.dart';
 import 'package:trackme_mobile/main.dart';
 
 class ChildItem {
@@ -39,10 +41,20 @@ class _HomeState extends State<Home> {
     super.initState();
     _children = [
       ChildItem(title: 'Profile', widget: const Profile()),
-      ChildItem(title: 'Bot Channels', widget: const BotChannels()),
-      ChildItem(title: 'Locations', widget: const Locations()),
       ChildItem(
-          title: 'Aliases', widget: Aliases(reloadUserData: _loadUserData)),
+          title: 'Bot Channels',
+          widget: BotChannels(
+            reloadUserData: _loadUserData,
+          )),
+      ChildItem(
+          title: 'Locations',
+          widget: Locations(
+            reloadUserData: _loadUserData,
+          )),
+      ChildItem(
+        title: 'Aliases',
+        widget: Aliases(reloadUserData: _loadUserData),
+      ),
     ];
     _loadUserData();
   }
@@ -54,7 +66,6 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _loadUserData() async {
-    _user.setNotReady();
     Map<String, dynamic> result = await getUserData();
     if (result['code'] == 200) {
       _user.setData(result['detail']);
@@ -88,7 +99,7 @@ class _HomeState extends State<Home> {
                 child: const Text('Add'),
                 onPressed: () async {
                   if (_newAlias != '') {
-                    await updateAlias({
+                    await updateUser({
                       'aliases': [_newAlias, ..._user.aliases],
                     });
                     await _loadUserData();
@@ -101,10 +112,15 @@ class _HomeState extends State<Home> {
         },
       );
     } else {
-      MainApp.navKey.currentState?.pushNamed('/location');
+      MainApp.navKey.currentState?.pushNamed(
+        ChooseLocation.route,
+        arguments: LocationArgs(
+          callback: _loadUserData,
+          currentLocationList: _user.locations,
+          currentIndex: -1,
+        ),
+      );
     }
-
-    // return null;
   }
 
   @override
