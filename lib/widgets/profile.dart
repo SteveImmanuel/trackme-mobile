@@ -1,11 +1,20 @@
+import 'dart:isolate';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:provider/provider.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:trackme_mobile/utilities/gps.dart';
-import 'package:trackme_mobile/utilities/api.dart';
 import 'package:location/location.dart';
+import 'package:trackme_mobile/utilities/api.dart';
+import 'package:trackme_mobile/utilities/gps.dart';
 import 'package:trackme_mobile/models/user.dart';
 import 'package:trackme_mobile/utilities/snackbar_factory.dart';
+import 'package:trackme_mobile/utilities/foreground_service.dart';
+
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(LocationTaskHandler());
+}
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -17,10 +26,35 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final List<bool> _isActive = [false];
   final List<int> _postIntervalList = [2, 5, 10, 15, 30, 60];
-  int postInterval = 10;
+  late SharedPreferences prefs;
+  int _postInterval = 10;
   bool _isLoading = false;
+  ReceivePort? _receivePort;
+  DateTime _lastPostTimestamp = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPostInterval();
+  }
+
+  Future<void> _loadPostInterval() async {
+    prefs = await SharedPreferences.getInstance();
+    int? savedInterval = prefs.getInt('postInterval');
+    if (savedInterval != null) {
+      setState(() {
+        _postInterval = savedInterval;
+      });
+    }
+  }
 
   void _onSwitched(int idx) {
+    if (_isActive[idx]) {
+      // initially active, then turn off
+      _stopForegroundTask();
+    } else {
+      _startForegroundTask();
+    }
     setState(() {
       _isActive[idx] = !_isActive[idx];
     });
@@ -28,41 +62,93 @@ class _ProfileState extends State<Profile> {
 
   void _onIntervalChanged(int? value) {
     setState(() {
-      postInterval = value!;
+      _postInterval = value!;
     });
+    prefs.setInt('postInterval', _postInterval);
+  }
+
+  Future<Map<String, dynamic>> _postCurrentLocation() async {
+    LocationData currentLocation = await getCurrentLocation();
+    return await postLocation(currentLocation.latitude.toString(),
+        currentLocation.longitude.toString());
   }
 
   Future<void> _onSubmitLocation(BuildContext context) async {
     setState(() {
       _isLoading = true;
     });
-    LocationData currentLocation = await getCurrentLocation();
-    if (currentLocation.latitude != null && currentLocation.longitude != null) {
-      Map<String, dynamic> postResult = await postLocation(
-        currentLocation.latitude.toString(),
-        currentLocation.longitude.toString(),
-      );
+    Map<String, dynamic> postResult = await _postCurrentLocation();
 
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      SnackBar snackBar;
-      if (postResult['code'] == 200) {
-        snackBar = SnackBarFactory.create(
-          duration: 1000,
-          type: SnackBarType.success,
-          content: 'Post Location Success',
-        );
-      } else {
-        snackBar = SnackBarFactory.create(
-          duration: 1000,
-          type: SnackBarType.failed,
-          content: 'Post Location Failed',
-        );
-      }
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    SnackBar snackBar;
+    if (postResult['code'] == 200) {
+      snackBar = SnackBarFactory.create(
+        duration: 1000,
+        type: SnackBarType.success,
+        content: 'Post Location Success',
+      );
+    } else {
+      snackBar = SnackBarFactory.create(
+        duration: 1000,
+        type: SnackBarType.failed,
+        content: 'Post Location Failed',
+      );
     }
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _onReceivedFromForeground(dynamic _) async {
+    DateTime now = DateTime.now();
+    int diff = now.difference(_lastPostTimestamp).inMinutes;
+
+    if (diff >= _postInterval) {
+      Map<String, dynamic> postResult = await _postCurrentLocation();
+      if (postResult['code'] == 200) {
+        String formattedNow = DateFormat('hh:mm a').format(now);
+        await FlutterForegroundTask.updateService(
+          notificationTitle: 'TrackMe Tracking Service',
+          notificationText: 'Last Posted: $formattedNow',
+          callback: null,
+        );
+        _lastPostTimestamp = now;
+      }
+    }
+  }
+
+  Future<bool> _stopForegroundTask() async {
+    return await FlutterForegroundTask.stopService();
+  }
+
+  Future<bool> _startForegroundTask() async {
+    ReceivePort? receivePort;
+
+    if (await FlutterForegroundTask.isRunningService) {
+      receivePort = await FlutterForegroundTask.restartService();
+    } else {
+      receivePort = await FlutterForegroundTask.startService(
+        notificationTitle: 'TrackMe Tracking Service',
+        notificationText: 'Last Posted: - ',
+        callback: startCallback,
+      );
+    }
+
+    if (receivePort != null) {
+      _receivePort = receivePort;
+      _receivePort?.listen(_onReceivedFromForeground);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
+  void dispose() {
+    _receivePort?.close();
+    super.dispose();
   }
 
   @override
@@ -126,7 +212,7 @@ class _ProfileState extends State<Profile> {
                 horizontal: 10,
               ),
               child: DropdownButton(
-                value: postInterval,
+                value: _postInterval,
                 icon: const Icon(Icons.arrow_downward),
                 items: _postIntervalList.map((int value) {
                   return DropdownMenuItem(
