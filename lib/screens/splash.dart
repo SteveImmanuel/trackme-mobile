@@ -19,9 +19,15 @@ class _SplashState extends State<Splash> {
     Map<String, dynamic> authCheckResult = await authCheck();
 
     if (authCheckResult['code'] == 200) {
-      MainApp.navKey.currentState?.pushNamed(Home.route);
+      MainApp.navKey.currentState?.pushNamedAndRemoveUntil(
+        Home.route,
+        (route) => false,
+      );
     } else {
-      MainApp.navKey.currentState?.pushNamed(Auth.route);
+      MainApp.navKey.currentState?.pushNamedAndRemoveUntil(
+        Auth.route,
+            (route) => false,
+      );
     }
   }
 
