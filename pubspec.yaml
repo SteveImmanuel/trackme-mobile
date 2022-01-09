@@ -28,8 +28,10 @@ dependencies:
   http: ^0.13.4
   animated_text_kit: ^4.2.1
   flutter_map: any
-  geolocator: ^8.0.1
   flutter_secure_storage: ^5.0.2
+  location: ^4.2.0
+  flutter_foreground_task: ^3.5.4
+
 
 dev_dependencies:
   flutter_test:
