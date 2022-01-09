@@ -77,8 +77,16 @@ class BotChannelList extends CustomList {
 
 class _BotChannelListState extends CustomListState<BotChannelList> {
   @override
-  void onConfirmDelete(BuildContext context, int idx) {
-    // TODO: implement onConfirmDelete
+  Future<void> onConfirmDelete(BuildContext context, int idx) async {
+    List<Map<String, dynamic>> updateData = (listData as List<BotChannel>)
+        .map((channel) => channel.toJson())
+        .toList();
+    updateUser({
+      'bot_channels': [
+        ...updateData.sublist(0, idx),
+        ...updateData.sublist(idx + 1)
+      ]
+    });
     super.onConfirmDelete(context, idx);
   }
 
