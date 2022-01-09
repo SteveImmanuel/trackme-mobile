@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const String apiUrl = 'https://87f9-2001-448a-4027-2888-43d3-1dc7-35ff-c255.ngrok.io';
+const String apiUrl = 'https://api.trackme.tk';
 FlutterSecureStorage storage = const FlutterSecureStorage();
 String accessToken = 'None';
 String refreshToken = 'None';
