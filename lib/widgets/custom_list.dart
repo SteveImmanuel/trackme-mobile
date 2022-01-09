@@ -20,7 +20,7 @@ class CustomListState<T extends CustomList> extends State<T> {
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
   late List listData = [];
 
-  void onConfirmDelete(BuildContext context, int idx) {
+  Future<void> onConfirmDelete(BuildContext context, int idx) async {
     Navigator.pop(context);
     widget.reloadUserData();
   }

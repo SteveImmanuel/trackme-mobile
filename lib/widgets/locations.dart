@@ -107,7 +107,7 @@ class LocationList extends CustomList {
 
 class _LocationListState extends CustomListState<LocationList> {
   @override
-  void onConfirmDelete(BuildContext context, int idx) {
+  Future<void> onConfirmDelete(BuildContext context, int idx) async {
     // TODO: implement onConfirmDelete
     super.onConfirmDelete(context, idx);
   }

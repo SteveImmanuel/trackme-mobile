@@ -47,7 +47,7 @@ class AliasList extends CustomList {
 class _AliasListState extends CustomListState<AliasList> {
   @override
   Future<void> onConfirmDelete(BuildContext context, int idx) async {
-    await updateAlias({
+    await updateUser({
       'aliases': [...listData.sublist(0, idx), ...listData.sublist(idx + 1)],
     });
     super.onConfirmDelete(context, idx);
