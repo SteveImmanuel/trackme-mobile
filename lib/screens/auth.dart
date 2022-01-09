@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:trackme_mobile/utilities/api.dart';
+import 'package:trackme_mobile/main.dart';
+import 'package:trackme_mobile/screens/home.dart';
 
 class Auth extends StatefulWidget {
   static String route = '/auth';
@@ -47,14 +49,17 @@ class _AuthState extends State<Auth> {
     } else {
       authResult = await register(_username, _password);
     }
-    setState(() {
-      _isLoading = false;
-      if (_index == 1) {
-        _index = 0;
-      } else {
 
-      }
-    });
+    if (authResult['code'] == 200) {
+      setState(() {
+        _isLoading = false;
+        if (_index == 1) {
+          _index = 0;
+        } else {
+          MainApp.navKey.currentState?.pushNamed(Home.route);
+        }
+      });
+    }
   }
 
   @override
