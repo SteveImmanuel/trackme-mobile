@@ -34,11 +34,6 @@ class User extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setNotReady() {
-    isReady = false;
-    notifyListeners();
-  }
-
   Map<String, dynamic> toJson() => {
         'username': username,
         'aliases': aliases,
