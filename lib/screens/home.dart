@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:trackme_mobile/screens/choose_location.dart';
 import 'package:trackme_mobile/widgets/bot_channels.dart';
 import 'package:trackme_mobile/widgets/locations.dart';
@@ -12,6 +13,7 @@ import 'package:trackme_mobile/utilities/api.dart';
 import 'package:trackme_mobile/utilities/route_arguments.dart';
 import 'package:trackme_mobile/main.dart';
 import 'package:trackme_mobile/utilities/snackbar_factory.dart';
+import 'package:trackme_mobile/utilities/foreground_service.dart';
 
 class ChildItem {
   String title;
@@ -40,6 +42,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    initForegroundTask();
     _children = [
       ChildItem(title: 'Profile', widget: const Profile()),
       ChildItem(
@@ -158,57 +161,61 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => _user,
-      child: Scaffold(
-        appBar: AppBar(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Theme.of(context).appBarTheme.backgroundColor,
-            statusBarIconBrightness: Brightness.dark,
-            statusBarBrightness: Brightness.light,
+      child: WithForegroundTask(
+        child: Scaffold(
+          appBar: AppBar(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Theme.of(context).appBarTheme.backgroundColor,
+              statusBarIconBrightness: Brightness.dark,
+              statusBarBrightness: Brightness.light,
+            ),
+            title: Text(_children[_currentIndex].title),
           ),
-          title: Text(_children[_currentIndex].title),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: IndexedStack(
-            index: _currentIndex,
-            children: _children.map((ChildItem child) => child.widget).toList(),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: IndexedStack(
+              index: _currentIndex,
+              children:
+                  _children.map((ChildItem child) => child.widget).toList(),
+            ),
           ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onBottomNavTapped,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outlined),
+                activeIcon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.chat_outlined),
+                activeIcon: Icon(Icons.chat),
+                label: 'Bot Channels',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.location_on_outlined),
+                activeIcon: Icon(Icons.location_on),
+                label: 'Locations',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.campaign_outlined),
+                activeIcon: Icon(Icons.campaign),
+                label: 'Aliases',
+              ),
+            ],
+            type: BottomNavigationBarType.fixed,
+          ),
+          floatingActionButton: (_currentIndex == 2 || _currentIndex == 3)
+              ? FloatingActionButton(
+                  child: const Icon(Icons.add),
+                  onPressed: () => _onAddButtonTapped(context),
+                )
+              : null,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          resizeToAvoidBottomInset: false,
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onBottomNavTapped,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outlined),
-              activeIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.chat_outlined),
-              activeIcon: Icon(Icons.chat),
-              label: 'Bot Channels',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.location_on_outlined),
-              activeIcon: Icon(Icons.location_on),
-              label: 'Locations',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.campaign_outlined),
-              activeIcon: Icon(Icons.campaign),
-              label: 'Aliases',
-            ),
-          ],
-          type: BottomNavigationBarType.fixed,
-        ),
-        floatingActionButton: (_currentIndex == 2 || _currentIndex == 3)
-            ? FloatingActionButton(
-                child: const Icon(Icons.add),
-                onPressed: () => _onAddButtonTapped(context),
-              )
-            : null,
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        resizeToAvoidBottomInset: false,
       ),
     );
   }
