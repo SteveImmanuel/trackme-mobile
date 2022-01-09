@@ -13,7 +13,6 @@ import 'package:trackme_mobile/utilities/route_arguments.dart';
 import 'package:trackme_mobile/main.dart';
 import 'package:trackme_mobile/utilities/snackbar_factory.dart';
 
-
 class ChildItem {
   String title;
   Widget widget;
@@ -87,7 +86,7 @@ class _HomeState extends State<Home> {
         content: 'Adding New Alias',
       ));
 
-      Map<String,dynamic> updateResult = await updateUser({
+      Map<String, dynamic> updateResult = await updateUser({
         'aliases': [_newAlias, ..._user.aliases],
       });
 
@@ -105,6 +104,7 @@ class _HomeState extends State<Home> {
           content: 'Add New Alias Failed',
         ));
       }
+      _newAlias = '';
 
       await _loadUserData();
     }
@@ -129,7 +129,10 @@ class _HomeState extends State<Home> {
             actions: [
               TextButton(
                 child: const Text('Cancel'),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  _newAlias = '';
+                  Navigator.pop(context);
+                },
               ),
               TextButton(
                 child: const Text('Add'),
@@ -143,11 +146,10 @@ class _HomeState extends State<Home> {
       MainApp.navKey.currentState?.pushNamed(
         ChooseLocation.route,
         arguments: LocationArgs(
-          callback: _loadUserData,
-          currentLocationList: _user.locations,
-          currentIndex: -1,
-          parentContext: parentContext
-        ),
+            callback: _loadUserData,
+            currentLocationList: _user.locations,
+            currentIndex: -1,
+            parentContext: parentContext),
       );
     }
   }
