@@ -24,21 +24,22 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final List<bool> _isActive = [false];
+  late final List<bool> _isActive = [false];
   final List<int> _postIntervalList = [2, 5, 10, 15, 30, 60];
   late SharedPreferences prefs;
   int _postInterval = 10;
   bool _isLoading = false;
   ReceivePort? _receivePort;
   DateTime _lastPostTimestamp = DateTime.now();
+  bool _isPosting = false;
 
   @override
   void initState() {
     super.initState();
-    _loadPostInterval();
+    _loadInitialData();
   }
 
-  Future<void> _loadPostInterval() async {
+  Future<void> _loadInitialData() async {
     prefs = await SharedPreferences.getInstance();
     int? savedInterval = prefs.getInt('postInterval');
     if (savedInterval != null) {
@@ -46,6 +47,7 @@ class _ProfileState extends State<Profile> {
         _postInterval = savedInterval;
       });
     }
+    _isActive[0] = await FlutterForegroundTask.isRunningService;
   }
 
   void _onSwitched(int idx) {
@@ -104,7 +106,8 @@ class _ProfileState extends State<Profile> {
     DateTime now = DateTime.now();
     int diff = now.difference(_lastPostTimestamp).inMinutes;
 
-    if (diff >= _postInterval) {
+    if (diff >= _postInterval && !_isPosting) {
+      _isPosting = true;
       Map<String, dynamic> postResult = await _postCurrentLocation();
       if (postResult['code'] == 200) {
         String formattedNow = DateFormat('hh:mm a').format(now);
@@ -114,6 +117,7 @@ class _ProfileState extends State<Profile> {
           callback: null,
         );
         _lastPostTimestamp = now;
+        _isPosting = false;
       }
     }
   }
@@ -125,12 +129,10 @@ class _ProfileState extends State<Profile> {
   Future<bool> _startForegroundTask() async {
     ReceivePort? receivePort;
 
-    if (await FlutterForegroundTask.isRunningService) {
-      receivePort = await FlutterForegroundTask.restartService();
-    } else {
+    if (!(await FlutterForegroundTask.isRunningService)) {
       receivePort = await FlutterForegroundTask.startService(
         notificationTitle: 'TrackMe Tracking Service',
-        notificationText: 'Last Posted: - ',
+        notificationText: 'Last Posted: -',
         callback: startCallback,
       );
     }

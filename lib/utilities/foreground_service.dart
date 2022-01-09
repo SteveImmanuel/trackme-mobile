@@ -24,9 +24,9 @@ Future<void> initForegroundTask() async {
       playSound: false,
     ),
     foregroundTaskOptions: const ForegroundTaskOptions(
-      interval: 5000,
+      interval: 60000,
       autoRunOnBoot: true,
-      allowWifiLock: true,
+      allowWifiLock: true
     ),
     printDevLog: true,
   );
