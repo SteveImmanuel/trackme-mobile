@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trackme_mobile/models/user.dart';
-import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/utilities/snackbar_factory.dart';
+import 'package:trackme/models/user.dart';
+import 'package:trackme/utilities/custom_callback_types.dart';
+import 'package:trackme/utilities/snackbar_factory.dart';
 
 class CustomList extends StatefulWidget {
   const CustomList({

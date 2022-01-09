@@ -3,11 +3,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/utilities/api.dart';
-import 'package:trackme_mobile/utilities/gps.dart';
-import 'package:trackme_mobile/models/location.dart' as location_model;
-import 'package:trackme_mobile/utilities/snackbar_factory.dart';
+import 'package:trackme/utilities/custom_callback_types.dart';
+import 'package:trackme/utilities/api.dart';
+import 'package:trackme/utilities/gps.dart';
+import 'package:trackme/models/location.dart' as location_model;
+import 'package:trackme/utilities/snackbar_factory.dart';
 
 class MapViewer extends StatefulWidget {
   final UpdateLatLong updateLatLongCallback;

@@ -1,6 +1,6 @@
 {
-    "name": "trackme_mobile",
-    "short_name": "trackme_mobile",
+    "name": "trackme",
+    "short_name": "trackme",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

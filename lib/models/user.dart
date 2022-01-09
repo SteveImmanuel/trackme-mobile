@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:trackme_mobile/models/bot_channel.dart';
-import 'package:trackme_mobile/models/location.dart';
+import 'package:trackme/models/bot_channel.dart';
+import 'package:trackme/models/location.dart';
 
 class User extends ChangeNotifier {
   String username;

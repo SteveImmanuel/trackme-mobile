@@ -13,7 +13,7 @@ Future<void> initForegroundTask() async {
       iconData: const NotificationIconData(
         resType: ResourceType.mipmap,
         resPrefix: ResourcePrefix.ic,
-        name: 'launcher',
+        name: 'launcher_icon',
       ),
       buttons: [
         const NotificationButton(id: 'stopService', text: 'STOP'),

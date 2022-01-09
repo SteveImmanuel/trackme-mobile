@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/models/location.dart';
+import 'package:trackme/utilities/custom_callback_types.dart';
+import 'package:trackme/models/location.dart';
 
 class LocationArgs {
   ReloadUserData callback;

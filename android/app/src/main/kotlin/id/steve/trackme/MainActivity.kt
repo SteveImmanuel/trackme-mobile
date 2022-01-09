@@ -1,4 +1,4 @@
-package com.example.trackme_mobile
+package id.steve.trackme
 
 import io.flutter.embedding.android.FlutterActivity
 

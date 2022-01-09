@@ -6,11 +6,11 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:provider/provider.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:location/location.dart';
-import 'package:trackme_mobile/utilities/api.dart';
-import 'package:trackme_mobile/utilities/gps.dart';
-import 'package:trackme_mobile/models/user.dart';
-import 'package:trackme_mobile/utilities/snackbar_factory.dart';
-import 'package:trackme_mobile/utilities/foreground_service.dart';
+import 'package:trackme/utilities/api.dart';
+import 'package:trackme/utilities/gps.dart';
+import 'package:trackme/models/user.dart';
+import 'package:trackme/utilities/snackbar_factory.dart';
+import 'package:trackme/utilities/foreground_service.dart';
 
 void startCallback() {
   FlutterForegroundTask.setTaskHandler(LocationTaskHandler());

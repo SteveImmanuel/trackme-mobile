@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:trackme_mobile/screens/choose_location.dart';
-import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/utilities/route_arguments.dart';
-import 'package:trackme_mobile/widgets/custom_list.dart';
-import 'package:trackme_mobile/models/location.dart';
-import 'package:trackme_mobile/utilities/api.dart';
+import 'package:trackme/screens/choose_location.dart';
+import 'package:trackme/utilities/custom_callback_types.dart';
+import 'package:trackme/utilities/route_arguments.dart';
+import 'package:trackme/widgets/custom_list.dart';
+import 'package:trackme/models/location.dart';
+import 'package:trackme/utilities/api.dart';
 
 class LocationListItem extends StatelessWidget {
   const LocationListItem({

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:trackme_mobile/utilities/api.dart';
-import 'package:trackme_mobile/screens/home.dart';
-import 'package:trackme_mobile/screens/auth.dart';
-import 'package:trackme_mobile/main.dart';
+import 'package:trackme/utilities/api.dart';
+import 'package:trackme/screens/home.dart';
+import 'package:trackme/screens/auth.dart';
+import 'package:trackme/main.dart';
 
 class Splash extends StatefulWidget {
   static String route = '/';

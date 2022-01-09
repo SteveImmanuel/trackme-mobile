@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:trackme_mobile/screens/home.dart';
-import 'package:trackme_mobile/screens/auth.dart';
-import 'package:trackme_mobile/screens/choose_location.dart';
-import 'package:trackme_mobile/screens/splash.dart';
-import 'package:trackme_mobile/utilities/route_arguments.dart';
+import 'package:trackme/screens/home.dart';
+import 'package:trackme/screens/auth.dart';
+import 'package:trackme/screens/choose_location.dart';
+import 'package:trackme/screens/splash.dart';
+import 'package:trackme/utilities/route_arguments.dart';
 
 void main() {
   runApp(const MainApp());

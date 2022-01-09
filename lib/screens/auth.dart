@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:trackme_mobile/utilities/api.dart';
-import 'package:trackme_mobile/main.dart';
-import 'package:trackme_mobile/screens/home.dart';
-import 'package:trackme_mobile/utilities/snackbar_factory.dart';
+import 'package:trackme/utilities/api.dart';
+import 'package:trackme/main.dart';
+import 'package:trackme/screens/home.dart';
+import 'package:trackme/utilities/snackbar_factory.dart';
 
 class Auth extends StatefulWidget {
   static String route = '/auth';
