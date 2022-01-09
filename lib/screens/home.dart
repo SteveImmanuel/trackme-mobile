@@ -11,6 +11,8 @@ import 'package:trackme_mobile/models/user.dart';
 import 'package:trackme_mobile/utilities/api.dart';
 import 'package:trackme_mobile/utilities/route_arguments.dart';
 import 'package:trackme_mobile/main.dart';
+import 'package:trackme_mobile/utilities/snackbar_factory.dart';
+
 
 class ChildItem {
   String title;
@@ -74,10 +76,44 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> _onAddButtonTapped(BuildContext context) async {
+  Future<void> _onAddAlias(BuildContext context) async {
+    if (_newAlias != '') {
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+        duration: 3000000,
+        type: SnackBarType.loading,
+        content: 'Adding New Alias',
+      ));
+
+      Map<String,dynamic> updateResult = await updateUser({
+        'aliases': [_newAlias, ..._user.aliases],
+      });
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      if (updateResult['code'] == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+          duration: 1000,
+          type: SnackBarType.success,
+          content: 'Add New Alias Success',
+        ));
+      } else if (updateResult['code'] != 401) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+          duration: 1000,
+          type: SnackBarType.failed,
+          content: 'Add New Alias Failed',
+        ));
+      }
+
+      await _loadUserData();
+    }
+  }
+
+  Future<void> _onAddButtonTapped(BuildContext parentContext) async {
     if (_currentIndex == 3) {
       return showDialog(
-        context: context,
+        context: parentContext,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Add New Alias'),
@@ -97,15 +133,7 @@ class _HomeState extends State<Home> {
               ),
               TextButton(
                 child: const Text('Add'),
-                onPressed: () async {
-                  if (_newAlias != '') {
-                    await updateUser({
-                      'aliases': [_newAlias, ..._user.aliases],
-                    });
-                    await _loadUserData();
-                    Navigator.pop(context);
-                  }
-                },
+                onPressed: () => _onAddAlias(parentContext),
               ),
             ],
           );
@@ -118,6 +146,7 @@ class _HomeState extends State<Home> {
           callback: _loadUserData,
           currentLocationList: _user.locations,
           currentIndex: -1,
+          parentContext: parentContext
         ),
       );
     }
