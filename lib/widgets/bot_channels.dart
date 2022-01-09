@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
 import 'package:trackme_mobile/models/bot_channel.dart';
-import 'package:trackme_mobile/widgets/custom_animated_list.dart';
+import 'package:trackme_mobile/widgets/custom_list.dart';
 import 'package:trackme_mobile/utilities/api.dart';
 
 class BotChannelListItem extends StatelessWidget {
@@ -67,14 +67,15 @@ class BotChannelListItem extends StatelessWidget {
   }
 }
 
-class BotChannelList extends CustomAnimatedList {
-  const BotChannelList({Key? key}) : super(key: key, type: 'Bot Channel');
+class BotChannelList extends CustomList {
+  const BotChannelList({Key? key, required reloadUserData})
+      : super(key: key, type: 'Bot Channel', reloadUserData: reloadUserData);
 
   @override
   _BotChannelListState createState() => _BotChannelListState();
 }
 
-class _BotChannelListState extends CustomAnimatedListState<BotChannelList> {
+class _BotChannelListState extends CustomListState<BotChannelList> {
   @override
   void onConfirmDelete(BuildContext context, int idx) {
     // TODO: implement onConfirmDelete
@@ -82,26 +83,23 @@ class _BotChannelListState extends CustomAnimatedListState<BotChannelList> {
   }
 
   @override
-  Widget itemBuilder(
-    BuildContext context,
-    int index,
-    Animation<double> animation,
-  ) {
+  Widget createItem(int index) {
     BotChannel channel = listData[index] as BotChannel;
-    Widget child = BotChannelListItem(
+    return BotChannelListItem(
       idx: index,
       name: channel.displayName,
       photoUrl: channel.photoUrl,
       platform: channel.platform,
-      type: 'User',
+      type: channel.type,
       onDeleteTapped: onDeleteTapped,
     );
-    return baseItemBuilder(context, index, animation, child);
   }
 }
 
 class BotChannels extends StatefulWidget {
-  const BotChannels({Key? key}) : super(key: key);
+  final VoidCallback reloadUserData;
+
+  const BotChannels({Key? key, required this.reloadUserData}) : super(key: key);
 
   @override
   _BotChannelsState createState() => _BotChannelsState();
@@ -179,7 +177,7 @@ class _BotChannelsState extends State<BotChannels> {
           ),
         ),
         const SizedBox(height: 5),
-        const BotChannelList(),
+        BotChannelList(reloadUserData: widget.reloadUserData),
       ],
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/widgets/custom_animated_list.dart';
+import 'package:trackme_mobile/widgets/custom_list.dart';
 import 'package:trackme_mobile/models/location.dart';
 
 class LocationListItem extends StatelessWidget {
@@ -97,14 +97,15 @@ class LocationListItem extends StatelessWidget {
   }
 }
 
-class LocationList extends CustomAnimatedList {
-  const LocationList({Key? key}) : super(key: key, type: 'Location');
+class LocationList extends CustomList {
+  const LocationList({Key? key, required reloadUserData})
+      : super(key: key, type: 'Location', reloadUserData: reloadUserData);
 
   @override
   _LocationListState createState() => _LocationListState();
 }
 
-class _LocationListState extends CustomAnimatedListState<LocationList> {
+class _LocationListState extends CustomListState<LocationList> {
   @override
   void onConfirmDelete(BuildContext context, int idx) {
     // TODO: implement onConfirmDelete
@@ -112,13 +113,9 @@ class _LocationListState extends CustomAnimatedListState<LocationList> {
   }
 
   @override
-  Widget itemBuilder(
-    BuildContext context,
-    int index,
-    Animation<double> animation,
-  ) {
+  Widget createItem(int index) {
     Location location = listData[index] as Location;
-    Widget child = LocationListItem(
+    return LocationListItem(
       idx: index,
       name: location.name,
       latitude: location.latitude,
@@ -127,12 +124,13 @@ class _LocationListState extends CustomAnimatedListState<LocationList> {
       alertOnLeave: location.alertOnLeave,
       onDeleteTapped: onDeleteTapped,
     );
-    return baseItemBuilder(context, index, animation, child);
   }
 }
 
 class Locations extends StatelessWidget {
-  const Locations({Key? key}) : super(key: key);
+  final VoidCallback reloadUserData;
+
+  const Locations({Key? key, required this.reloadUserData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +151,7 @@ class Locations extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 5),
-        const LocationList(),
+        LocationList(reloadUserData: reloadUserData),
       ],
     );
   }

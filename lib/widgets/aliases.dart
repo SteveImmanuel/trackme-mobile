@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
-import 'package:trackme_mobile/widgets/custom_animated_list.dart';
+import 'package:trackme_mobile/widgets/custom_list.dart';
 import 'package:trackme_mobile/utilities/api.dart';
 
 class AliasListItem extends StatelessWidget {
@@ -36,40 +36,32 @@ class AliasListItem extends StatelessWidget {
   }
 }
 
-class AliasList extends CustomAnimatedList {
-  final VoidCallback reloadUserData;
-
-  const AliasList({Key? key, required this.reloadUserData})
-      : super(key: key, type: 'Alias');
+class AliasList extends CustomList {
+  const AliasList({Key? key, required reloadUserData})
+      : super(key: key, type: 'Alias', reloadUserData: reloadUserData);
 
   @override
   _AliasListState createState() => _AliasListState();
 }
 
-class _AliasListState extends CustomAnimatedListState<AliasList> {
+class _AliasListState extends CustomListState<AliasList> {
   @override
   Future<void> onConfirmDelete(BuildContext context, int idx) async {
     await updateAlias({
       'aliases': [...listData.sublist(0, idx), ...listData.sublist(idx + 1)],
     });
     super.onConfirmDelete(context, idx);
-    widget.reloadUserData();
   }
 
   @override
-  Widget itemBuilder(
-    BuildContext context,
-    int index,
-    Animation<double> animation,
-  ) {
+  Widget createItem(int index) {
     String alias = listData[index] as String;
 
-    Widget child = AliasListItem(
+    return AliasListItem(
       idx: index,
       name: alias,
       onDeleteTapped: onDeleteTapped,
     );
-    return baseItemBuilder(context, index, animation, child);
   }
 }
 
