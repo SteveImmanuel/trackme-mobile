@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
 import 'package:trackme_mobile/utilities/api.dart';
-import 'package:trackme_mobile/models/location.dart';
+import 'package:trackme_mobile/utilities/gps.dart';
+import 'package:trackme_mobile/models/location.dart' as location_model;
+import 'package:trackme_mobile/utilities/snackbar_factory.dart';
 
 class MapViewer extends StatefulWidget {
   final UpdateLatLong updateLatLongCallback;
@@ -39,33 +41,12 @@ class _MapViewerState extends State<MapViewer> {
   }
 
   Future<void> _getCurrentPosition() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-    LocationPermission permission;
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
+    LocationData curPos = await getCurrentLocation();
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    Position curPos = await Geolocator.getCurrentPosition();
-    _mapController.move(LatLng(curPos.latitude, curPos.longitude), 15);
-    widget.updateLatLongCallback(curPos.latitude, curPos.longitude);
+    double latitude = curPos.latitude ?? 50.010083;
+    double longitude = curPos.longitude ?? -110.113006;
+    _mapController.move(LatLng(latitude, longitude), _mapController.zoom);
+    widget.updateLatLongCallback(latitude, longitude);
   }
 
   @override
@@ -138,16 +119,17 @@ class ChooseLocation extends StatefulWidget {
   static String route = '/location';
 
   final ReloadUserData callback;
-  final List<Location> currentLocationList;
+  final List<location_model.Location> currentLocationList;
   final int currentIndex;
+  final BuildContext parentContext;
 
-  const ChooseLocation(
-      {Key? key,
-      required this.callback,
-      required this.currentLocationList,
-      required this.currentIndex // -1 to indicate add new
-      })
-      : super(key: key);
+  const ChooseLocation({
+    Key? key,
+    required this.callback,
+    required this.currentLocationList,
+    required this.currentIndex, // -1 to indicate add new
+    required this.parentContext,
+  }) : super(key: key);
 
   @override
   _ChooseLocationState createState() => _ChooseLocationState();
@@ -184,13 +166,9 @@ class _ChooseLocationState extends State<ChooseLocation> {
     return null;
   }
 
-  Future<void> _onSubmit(BuildContext context) async {
+  Future<void> _onSubmit() async {
     if (_formKey.currentState!.validate()) {
-      // If the form is valid, display a snackbar. In the real world,
-      // you'd often call a server or save the information in a database.
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Processing Data')),
-      // );
+      Navigator.pop(widget.parentContext);
       List<Map<String, dynamic>> updateData = widget.currentLocationList
           .map((location) => location.toJson())
           .toList();
@@ -202,24 +180,53 @@ class _ChooseLocationState extends State<ChooseLocation> {
         'alert_on_leave': _alertOnLeave,
         'alert_on_arrive': _alertOnArrive,
       };
+
+      String msg;
+      String msg2;
+
       if (widget.currentIndex == -1) {
         updateData.add(newValue);
+        msg = 'Adding New Location';
+        msg2 = 'Add New Location';
       } else {
         updateData[widget.currentIndex] = newValue;
+        msg = 'Updating New Location';
+        msg2 = 'Update Location';
       }
 
-      await updateUser({'locations': updateData});
+      ScaffoldMessenger.of(widget.parentContext).hideCurrentSnackBar();
+      ScaffoldMessenger.of(widget.parentContext).showSnackBar(SnackBarFactory.create(
+        duration: 3000000,
+        type: SnackBarType.loading,
+        content: msg,
+      ));
 
+      Map<String, dynamic> updateResult =
+          await updateUser({'locations': updateData});
+      ScaffoldMessenger.of(widget.parentContext).hideCurrentSnackBar();
+      if (updateResult['code'] == 200) {
+        ScaffoldMessenger.of(widget.parentContext).showSnackBar(SnackBarFactory.create(
+          duration: 1000,
+          type: SnackBarType.success,
+          content: '$msg2 Success',
+        ));
+      } else if (updateResult['code'] != 401) {
+        ScaffoldMessenger.of(widget.parentContext).showSnackBar(SnackBarFactory.create(
+          duration: 1000,
+          type: SnackBarType.failed,
+          content: '$msg2 Failed',
+        ));
+      }
       widget.callback();
-      Navigator.pop(context);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.currentIndex != -1){
-      Location currentLocation = widget.currentLocationList[widget.currentIndex];
+    if (widget.currentIndex != -1) {
+      location_model.Location currentLocation =
+          widget.currentLocationList[widget.currentIndex];
       _latitude = double.parse(currentLocation.latitude);
       _longitude = double.parse(currentLocation.longitude);
       _alertOnLeave = currentLocation.alertOnLeave;
@@ -281,7 +288,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
                     ],
                   ),
                   ElevatedButton(
-                    onPressed: () => _onSubmit(context),
+                    onPressed: _onSubmit,
                     child: const Padding(
                       child: Text('CHOOSE THIS LOCATION'),
                       padding: EdgeInsets.all(15),

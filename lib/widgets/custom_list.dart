@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:trackme_mobile/models/user.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
+import 'package:trackme_mobile/utilities/snackbar_factory.dart';
 
 class CustomList extends StatefulWidget {
   const CustomList({
@@ -22,6 +23,29 @@ class CustomListState<T extends CustomList> extends State<T> {
 
   Future<void> onConfirmDelete(BuildContext context, int idx) async {
     Navigator.pop(context);
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+      duration: 3000000,
+      type: SnackBarType.loading,
+      content: 'Deleting ${widget.type}',
+    ));
+  }
+
+  void afterDelete(BuildContext context, int resultCode) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    if (resultCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+        duration: 1000,
+        type: SnackBarType.success,
+        content: 'Delete ${widget.type} Success',
+      ));
+    } else if (resultCode != 401) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+        duration: 1000,
+        type: SnackBarType.failed,
+        content: 'Delete ${widget.type} Failed',
+      ));
+    }
     widget.reloadUserData();
   }
 
@@ -29,7 +53,7 @@ class CustomListState<T extends CustomList> extends State<T> {
     Navigator.pop(context);
   }
 
-  Future<void> onDeleteTapped(BuildContext context, int idx, String name) {
+  Future<void> onDeleteTapped(BuildContext parentContext, int idx, String name) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -44,7 +68,7 @@ class CustomListState<T extends CustomList> extends State<T> {
             ),
             TextButton(
               child: const Text('Yes'),
-              onPressed: () => onConfirmDelete(context, idx),
+              onPressed: () => onConfirmDelete(parentContext, idx),
             ),
           ],
         );

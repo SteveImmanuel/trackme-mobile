@@ -117,21 +117,26 @@ class _LocationListState extends CustomListState<LocationList> {
           callback: widget.reloadUserData,
           currentLocationList: listData as List<Location>,
           currentIndex: idx,
+          parentContext: context
         ));
   }
 
   @override
   Future<void> onConfirmDelete(BuildContext context, int idx) async {
+    super.onConfirmDelete(context, idx);
+
     List<Map<String, dynamic>> updateData = (listData as List<Location>)
         .map((location) => location.toJson())
         .toList();
-    updateUser({
+
+    Map<String,dynamic> updateResult = await updateUser({
       'locations': [
         ...updateData.sublist(0, idx),
         ...updateData.sublist(idx + 1)
       ]
     });
-    super.onConfirmDelete(context, idx);
+
+    afterDelete(context, updateResult['code']);
   }
 
   @override

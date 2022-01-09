@@ -41,6 +41,7 @@ class MainApp extends StatelessWidget {
                 callback: args.callback,
                 currentLocationList: args.currentLocationList,
                 currentIndex: args.currentIndex,
+                parentContext: args.parentContext,
               );
             },
           );

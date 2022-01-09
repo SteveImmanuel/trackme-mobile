@@ -3,6 +3,7 @@ import 'package:trackme_mobile/utilities/custom_callback_types.dart';
 import 'package:trackme_mobile/widgets/custom_list.dart';
 import 'package:trackme_mobile/utilities/api.dart';
 
+
 class AliasListItem extends StatelessWidget {
   const AliasListItem({
     Key? key,
@@ -47,10 +48,13 @@ class AliasList extends CustomList {
 class _AliasListState extends CustomListState<AliasList> {
   @override
   Future<void> onConfirmDelete(BuildContext context, int idx) async {
-    await updateUser({
+    super.onConfirmDelete(context, idx);
+
+    Map<String,dynamic> updateResult = await updateUser({
       'aliases': [...listData.sublist(0, idx), ...listData.sublist(idx + 1)],
     });
-    super.onConfirmDelete(context, idx);
+
+    afterDelete(context, updateResult['code']);
   }
 
   @override

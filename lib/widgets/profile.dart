@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trackme_mobile/models/user.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:trackme_mobile/utilities/gps.dart';
+import 'package:trackme_mobile/utilities/api.dart';
+import 'package:location/location.dart';
+import 'package:trackme_mobile/models/user.dart';
+import 'package:trackme_mobile/utilities/snackbar_factory.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -14,6 +18,7 @@ class _ProfileState extends State<Profile> {
   final List<bool> _isActive = [false];
   final List<int> _postIntervalList = [2, 5, 10, 15, 30, 60];
   int postInterval = 10;
+  bool _isLoading = false;
 
   void _onSwitched(int idx) {
     setState(() {
@@ -24,6 +29,39 @@ class _ProfileState extends State<Profile> {
   void _onIntervalChanged(int? value) {
     setState(() {
       postInterval = value!;
+    });
+  }
+
+  Future<void> _onSubmitLocation(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
+    LocationData currentLocation = await getCurrentLocation();
+    if (currentLocation.latitude != null && currentLocation.longitude != null) {
+      Map<String, dynamic> postResult = await postLocation(
+        currentLocation.latitude.toString(),
+        currentLocation.longitude.toString(),
+      );
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      SnackBar snackBar;
+      if (postResult['code'] == 200) {
+        snackBar = SnackBarFactory.create(
+          duration: 1000,
+          type: SnackBarType.success,
+          content: 'Post Location Success',
+        );
+      } else {
+        snackBar = SnackBarFactory.create(
+          duration: 1000,
+          type: SnackBarType.failed,
+          content: 'Post Location Failed',
+        );
+      }
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -104,8 +142,18 @@ class _ProfileState extends State<Profile> {
           ],
         ),
         ElevatedButton(
-          onPressed: () {},
-          child: const Text('POST NOW'),
+          onPressed: _isLoading ? null : () => _onSubmitLocation(context),
+          child: _isLoading
+              ? const SizedBox(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.black45,
+                  ),
+                  height: 15,
+                  width: 15,
+                )
+              : const Text('POST NOW'),
+          style: ElevatedButton.styleFrom(minimumSize: const Size(100, 37)),
         ),
         const Spacer(flex: 5),
       ],
