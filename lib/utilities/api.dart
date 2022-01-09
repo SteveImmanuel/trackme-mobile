@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const String apiUrl = 'https://f434-2001-448a-4027-2888-1d4-d6af-86af-dd7e.ngrok.io';
+const String apiUrl = 'https://api.trackme.tk';
 FlutterSecureStorage storage = const FlutterSecureStorage();
 String accessToken = '';
 String refreshToken = '';
@@ -67,8 +67,7 @@ Future<void> initializeApi() async {
     storage.read(key: 'accessToken'),
     storage.read(key: 'refreshToken'),
   ]);
-  accessToken = 'None';
-  // accessToken = result[0] ?? 'None';
+  accessToken = result[0] ?? 'None';
   refreshToken = result[1] ?? 'None';
 }
 
@@ -160,4 +159,14 @@ Future<Map<String, dynamic>> updateUser(Map<String, dynamic> body) {
 
 Future<Map<String, dynamic>> generateBotToken() {
   return postAuthenticated('$apiUrl/bot/token', {});
+}
+
+Future<Map<String, dynamic>> postLocation(String latitude, String longitude) {
+  return postAuthenticated(
+    '$apiUrl/location',
+    {
+      "latitude": latitude,
+      "longitude": longitude,
+    },
+  );
 }
