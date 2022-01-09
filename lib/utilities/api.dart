@@ -4,8 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const String apiUrl = 'https://api.trackme.tk';
 FlutterSecureStorage storage = const FlutterSecureStorage();
-String accessToken = '';
-String refreshToken = '';
+String accessToken = 'None';
+String refreshToken = 'None';
 
 Future<Map<String, dynamic>> postAuthenticated(
   String url,
