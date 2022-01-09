@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:trackme_mobile/screens/choose_location.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
+import 'package:trackme_mobile/utilities/route_arguments.dart';
 import 'package:trackme_mobile/widgets/custom_list.dart';
 import 'package:trackme_mobile/models/location.dart';
+import 'package:trackme_mobile/utilities/api.dart';
 
 class LocationListItem extends StatelessWidget {
-  const LocationListItem(
-      {Key? key,
-      required this.name,
-      required this.latitude,
-      required this.longitude,
-      required this.alertOnLeave,
-      required this.alertOnArrive,
-      required this.idx,
-      required this.onDeleteTapped})
-      : super(key: key);
+  const LocationListItem({
+    Key? key,
+    required this.name,
+    required this.latitude,
+    required this.longitude,
+    required this.alertOnLeave,
+    required this.alertOnArrive,
+    required this.idx,
+    required this.onDeleteTapped,
+    required this.onUpdateLocation,
+  }) : super(key: key);
 
   final int idx;
   final String name;
@@ -22,6 +26,7 @@ class LocationListItem extends StatelessWidget {
   final bool alertOnLeave;
   final bool alertOnArrive;
   final DeleteListItem onDeleteTapped;
+  final OnUpdateLocation onUpdateLocation;
 
   String _formatCoordinates(String coordinate) {
     return num.parse(coordinate).toStringAsFixed(3);
@@ -91,7 +96,7 @@ class LocationListItem extends StatelessWidget {
             ],
           ),
         ),
-        onTap: () {},
+        onTap: () => onUpdateLocation(context, idx),
       ),
     );
   }
@@ -106,9 +111,26 @@ class LocationList extends CustomList {
 }
 
 class _LocationListState extends CustomListState<LocationList> {
+  void _onUpdateLocation(BuildContext context, int idx) {
+    Navigator.pushNamed(context, ChooseLocation.route,
+        arguments: LocationArgs(
+          callback: widget.reloadUserData,
+          currentLocationList: listData as List<Location>,
+          currentIndex: idx,
+        ));
+  }
+
   @override
   Future<void> onConfirmDelete(BuildContext context, int idx) async {
-    // TODO: implement onConfirmDelete
+    List<Map<String, dynamic>> updateData = (listData as List<Location>)
+        .map((location) => location.toJson())
+        .toList();
+    updateUser({
+      'locations': [
+        ...updateData.sublist(0, idx),
+        ...updateData.sublist(idx + 1)
+      ]
+    });
     super.onConfirmDelete(context, idx);
   }
 
@@ -123,6 +145,7 @@ class _LocationListState extends CustomListState<LocationList> {
       alertOnArrive: location.alertOnArrive,
       alertOnLeave: location.alertOnLeave,
       onDeleteTapped: onDeleteTapped,
+      onUpdateLocation: _onUpdateLocation,
     );
   }
 }

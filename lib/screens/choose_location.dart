@@ -4,13 +4,15 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:trackme_mobile/utilities/custom_callback_types.dart';
+import 'package:trackme_mobile/utilities/api.dart';
+import 'package:trackme_mobile/models/location.dart';
 
-class Map extends StatefulWidget {
+class MapViewer extends StatefulWidget {
   final UpdateLatLong updateLatLongCallback;
   final double? latitude;
   final double? longitude;
 
-  const Map({
+  const MapViewer({
     Key? key,
     required this.updateLatLongCallback,
     this.latitude,
@@ -18,10 +20,10 @@ class Map extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MapState createState() => _MapState();
+  _MapViewerState createState() => _MapViewerState();
 }
 
-class _MapState extends State<Map> {
+class _MapViewerState extends State<MapViewer> {
   final MapController _mapController = MapController();
   LatLng? initialPos;
 
@@ -135,14 +137,17 @@ class _MapState extends State<Map> {
 class ChooseLocation extends StatefulWidget {
   static String route = '/location';
 
-  final double? latitude;
-  final double? longitude;
+  final ReloadUserData callback;
+  final List<Location> currentLocationList;
+  final int currentIndex;
 
-  const ChooseLocation({
-    Key? key,
-    this.latitude,
-    this.longitude,
-  }) : super(key: key);
+  const ChooseLocation(
+      {Key? key,
+      required this.callback,
+      required this.currentLocationList,
+      required this.currentIndex // -1 to indicate add new
+      })
+      : super(key: key);
 
   @override
   _ChooseLocationState createState() => _ChooseLocationState();
@@ -179,27 +184,48 @@ class _ChooseLocationState extends State<ChooseLocation> {
     return null;
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       // If the form is valid, display a snackbar. In the real world,
       // you'd often call a server or save the information in a database.
       // ScaffoldMessenger.of(context).showSnackBar(
       //   const SnackBar(content: Text('Processing Data')),
       // );
-      //TODO: call update api
-      print(_name);
-      print(_alertOnArrive);
-      print(_alertOnLeave);
-      print(_latitude);
-      print(_longitude);
+      List<Map<String, dynamic>> updateData = widget.currentLocationList
+          .map((location) => location.toJson())
+          .toList();
+
+      Map<String, dynamic> newValue = {
+        'latitude': _latitude.toString(),
+        'longitude': _longitude.toString(),
+        'name': _name,
+        'alert_on_leave': _alertOnLeave,
+        'alert_on_arrive': _alertOnArrive,
+      };
+      if (widget.currentIndex == -1) {
+        updateData.add(newValue);
+      } else {
+        updateData[widget.currentIndex] = newValue;
+      }
+
+      await updateUser({'locations': updateData});
+
+      widget.callback();
+      Navigator.pop(context);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _latitude = widget.latitude;
-    _longitude = widget.longitude;
+    if (widget.currentIndex != -1){
+      Location currentLocation = widget.currentLocationList[widget.currentIndex];
+      _latitude = double.parse(currentLocation.latitude);
+      _longitude = double.parse(currentLocation.longitude);
+      _alertOnLeave = currentLocation.alertOnLeave;
+      _alertOnArrive = currentLocation.alertOnArrive;
+      _name = currentLocation.name;
+    }
   }
 
   void _updateLatLong(double latitude, double longitude) {
@@ -213,10 +239,10 @@ class _ChooseLocationState extends State<ChooseLocation> {
       body: Column(
         children: [
           Expanded(
-            child: Map(
+            child: MapViewer(
               updateLatLongCallback: _updateLatLong,
-              latitude: widget.longitude,
-              longitude: widget.longitude,
+              latitude: _latitude,
+              longitude: _longitude,
             ),
           ),
           Form(
@@ -228,11 +254,13 @@ class _ChooseLocationState extends State<ChooseLocation> {
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Name',
-                        hintText: 'Home, Work, Supermarket, etc.'),
+                      border: OutlineInputBorder(),
+                      labelText: 'Location Name',
+                      hintText: 'Home, Work, Supermarket, etc.',
+                    ),
                     onChanged: _onNameChanged,
                     validator: _validateName,
+                    initialValue: _name,
                   ),
                   Row(
                     children: [
@@ -253,7 +281,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
                     ],
                   ),
                   ElevatedButton(
-                    onPressed: _onSubmit,
+                    onPressed: () => _onSubmit(context),
                     child: const Padding(
                       child: Text('CHOOSE THIS LOCATION'),
                       padding: EdgeInsets.all(15),
