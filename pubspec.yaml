@@ -55,3 +55,6 @@ flutter:
     - family: RobotoMono
       fonts:
         - asset: assets/fonts/RobotoMono-Regular.ttf
+
+shared_preferences: ^2.0.11
+intl: ^0.17.0
