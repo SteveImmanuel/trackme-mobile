@@ -124,7 +124,6 @@ Future<Map<String, dynamic>> silentLogin() async {
       headers: {
         'Content-type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer $accessToken'
       });
 
   return jsonDecode(result.body);
@@ -138,7 +137,7 @@ Future<Map<String, dynamic>> getUserData() {
   return getAuthenticated('$apiUrl/user');
 }
 
-Future<Map<String, dynamic>> updateAlias(Map<String, dynamic> body) {
+Future<Map<String, dynamic>> updateUser(Map<String, dynamic> body) {
   return postAuthenticated('$apiUrl/user', body, isPut: true);
 }
 
