@@ -39,25 +39,29 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1280" height="275" key="GridCell.Tab.0.bottom" timestamp="1641743815627">
+    <state x="323" y="130" width="790" height="854" key="CommitChangelistDialog2" timestamp="1641744031415">
       <screen x="60" y="27" width="1860" height="1053" />
     </state>
-    <state width="1280" height="275" key="GridCell.Tab.0.bottom/60.27.1860.1053@60.27.1860.1053" timestamp="1641743815627" />
-    <state width="1280" height="275" key="GridCell.Tab.0.center" timestamp="1641743815624">
+    <state x="323" y="130" width="790" height="854" key="CommitChangelistDialog2/60.27.1860.1053@60.27.1860.1053" timestamp="1641744031415" />
+    <state width="1280" height="275" key="GridCell.Tab.0.bottom" timestamp="1641744021787">
       <screen x="60" y="27" width="1860" height="1053" />
     </state>
-    <state width="1280" height="275" key="GridCell.Tab.0.center/60.27.1860.1053@60.27.1860.1053" timestamp="1641743815624" />
-    <state width="1280" height="275" key="GridCell.Tab.0.left" timestamp="1641743815622">
+    <state width="1280" height="275" key="GridCell.Tab.0.bottom/60.27.1860.1053@60.27.1860.1053" timestamp="1641744021787" />
+    <state width="1280" height="275" key="GridCell.Tab.0.center" timestamp="1641744021786">
       <screen x="60" y="27" width="1860" height="1053" />
     </state>
-    <state width="1280" height="275" key="GridCell.Tab.0.left/60.27.1860.1053@60.27.1860.1053" timestamp="1641743815622" />
-    <state width="1280" height="275" key="GridCell.Tab.0.right" timestamp="1641743815625">
+    <state width="1280" height="275" key="GridCell.Tab.0.center/60.27.1860.1053@60.27.1860.1053" timestamp="1641744021786" />
+    <state width="1280" height="275" key="GridCell.Tab.0.left" timestamp="1641744021785">
       <screen x="60" y="27" width="1860" height="1053" />
     </state>
-    <state width="1280" height="275" key="GridCell.Tab.0.right/60.27.1860.1053@60.27.1860.1053" timestamp="1641743815625" />
-    <state x="386" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1641743783258">
+    <state width="1280" height="275" key="GridCell.Tab.0.left/60.27.1860.1053@60.27.1860.1053" timestamp="1641744021785" />
+    <state width="1280" height="275" key="GridCell.Tab.0.right" timestamp="1641744021787">
       <screen x="60" y="27" width="1860" height="1053" />
     </state>
-    <state x="386" y="259" width="672" height="678" key="search.everywhere.popup/60.27.1860.1053@60.27.1860.1053" timestamp="1641743783258" />
+    <state width="1280" height="275" key="GridCell.Tab.0.right/60.27.1860.1053@60.27.1860.1053" timestamp="1641744021787" />
+    <state x="386" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1641743928657">
+      <screen x="60" y="27" width="1860" height="1053" />
+    </state>
+    <state x="386" y="259" width="672" height="678" key="search.everywhere.popup/60.27.1860.1053@60.27.1860.1053" timestamp="1641743928657" />
   </component>
 </project>
