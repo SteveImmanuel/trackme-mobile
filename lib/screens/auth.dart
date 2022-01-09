@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:trackme_mobile/utilities/api.dart';
 import 'package:trackme_mobile/main.dart';
 import 'package:trackme_mobile/screens/home.dart';
+import 'package:trackme_mobile/utilities/snackbar_factory.dart';
 
 class Auth extends StatefulWidget {
   static String route = '/auth';
@@ -39,27 +40,47 @@ class _AuthState extends State<Auth> {
     _password = text;
   }
 
-  Future<void> _onSubmit() async {
+  Future<void> _onSubmit(BuildContext context) async {
     Map<String, dynamic> authResult;
     setState(() {
       _isLoading = true;
     });
+
+    String msg;
     if (_index == 0) {
       authResult = await login(_username, _password);
+      msg = 'Login Success';
     } else {
       authResult = await register(_username, _password);
+      msg = 'Register Success, Please Log In';
     }
 
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     if (authResult['code'] == 200) {
-      setState(() {
-        _isLoading = false;
-        if (_index == 1) {
-          _index = 0;
-        } else {
-          MainApp.navKey.currentState?.pushNamed(Home.route);
-        }
-      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+        duration: 1500,
+        type: SnackBarType.success,
+        content: msg,
+      ));
+      if (_index == 0) {
+        MainApp.navKey.currentState?.pushNamedAndRemoveUntil(
+          Home.route,
+          (route) => false,
+        );
+      } else {
+        _index = 0;
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+        duration: 2000,
+        type: SnackBarType.failed,
+        content: authResult['detail'],
+      ));
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -118,7 +139,7 @@ class _AuthState extends State<Auth> {
                     ),
                     style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).colorScheme.primary),
-                    onPressed: _isLoading ? null : _onSubmit,
+                    onPressed: _isLoading ? null : () => _onSubmit(context),
                   ),
                 )
               ]),
