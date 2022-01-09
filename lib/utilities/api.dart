@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const String apiUrl = 'http://192.168.1.8:5000';
+const String apiUrl = 'https://f434-2001-448a-4027-2888-1d4-d6af-86af-dd7e.ngrok.io';
 FlutterSecureStorage storage = const FlutterSecureStorage();
 String accessToken = '';
 String refreshToken = '';
@@ -67,8 +67,9 @@ Future<void> initializeApi() async {
     storage.read(key: 'accessToken'),
     storage.read(key: 'refreshToken'),
   ]);
-  accessToken = result[0];
-  refreshToken = result[1];
+  accessToken = 'None';
+  // accessToken = result[0] ?? 'None';
+  refreshToken = result[1] ?? 'None';
 }
 
 Future<Map<String, dynamic>> login(String username, String password) async {
@@ -126,6 +127,22 @@ Future<Map<String, dynamic>> silentLogin() async {
         'Accept': 'application/json',
       });
 
+  if (result.statusCode == 200) {
+    String rawBody = result.body;
+    Map<String, dynamic> decodedData = jsonDecode(rawBody);
+    await Future.wait([
+      storage.write(
+        key: 'accessToken',
+        value: decodedData['access_token'],
+      ),
+      storage.write(
+        key: 'refreshToken',
+        value: decodedData['refresh_token'],
+      ),
+    ]);
+    accessToken = decodedData['access_token'];
+    refreshToken = decodedData['refresh_token'];
+  }
   return jsonDecode(result.body);
 }
 
