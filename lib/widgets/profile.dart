@@ -105,20 +105,19 @@ class _ProfileState extends State<Profile> {
   Future<void> _onReceivedFromForeground(dynamic _) async {
     DateTime now = DateTime.now();
     int diff = now.difference(_lastPostTimestamp).inMinutes;
-
     if (diff >= _postInterval && !_isPosting) {
       _isPosting = true;
       Map<String, dynamic> postResult = await _postCurrentLocation();
       if (postResult['code'] == 200) {
         String formattedNow = DateFormat('hh:mm a').format(now);
         await FlutterForegroundTask.updateService(
-          notificationTitle: 'TrackMe Tracking Service',
+          notificationTitle: 'Tracking Service is ON',
           notificationText: 'Last Posted: $formattedNow',
           callback: null,
         );
         _lastPostTimestamp = now;
-        _isPosting = false;
       }
+      _isPosting = false;
     }
   }
 
@@ -131,7 +130,7 @@ class _ProfileState extends State<Profile> {
 
     if (!(await FlutterForegroundTask.isRunningService)) {
       receivePort = await FlutterForegroundTask.startService(
-        notificationTitle: 'TrackMe Tracking Service',
+        notificationTitle: 'Tracking Service is ON',
         notificationText: 'Last Posted: -',
         callback: startCallback,
       );

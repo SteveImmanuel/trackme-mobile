@@ -13,7 +13,7 @@ Future<void> initForegroundTask() async {
       iconData: const NotificationIconData(
         resType: ResourceType.mipmap,
         resPrefix: ResourcePrefix.ic,
-        name: 'launcher_icon',
+        name: 'launcher',
       ),
       buttons: [
         const NotificationButton(id: 'stopService', text: 'STOP'),
@@ -35,11 +35,6 @@ Future<void> initForegroundTask() async {
 class LocationTaskHandler extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
-    await FlutterForegroundTask.updateService(
-      notificationTitle: 'TrackMe Tracking Service',
-      notificationText: 'Location Tracking Is On',
-      callback: null,
-    );
   }
 
   @override
