@@ -1,5 +1,4 @@
 import 'dart:isolate';
-
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 Future<void> initForegroundTask() async {
@@ -7,7 +6,7 @@ Future<void> initForegroundTask() async {
     androidNotificationOptions: AndroidNotificationOptions(
       channelId: 'trackme_notif_channel',
       channelName: 'TrackMe Tracking Service',
-      channelDescription: 'TrackMe is running in background',
+      channelDescription: 'Tracks user location periodically in background',
       channelImportance: NotificationChannelImportance.LOW,
       priority: NotificationPriority.LOW,
       iconData: const NotificationIconData(
@@ -16,7 +15,7 @@ Future<void> initForegroundTask() async {
         name: 'launcher',
       ),
       buttons: [
-        const NotificationButton(id: 'stopService', text: 'STOP'),
+        NotificationButton(id: LocationTaskHandler.stopKeyword, text: 'STOP'),
       ],
     ),
     iosNotificationOptions: const IOSNotificationOptions(
@@ -33,8 +32,12 @@ Future<void> initForegroundTask() async {
 }
 
 class LocationTaskHandler extends TaskHandler {
+  SendPort? sendPort;
+  static String stopKeyword = 'stopService';
+
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
+    this.sendPort = sendPort;
   }
 
   @override
@@ -48,9 +51,10 @@ class LocationTaskHandler extends TaskHandler {
   }
 
   @override
-  void onButtonPressed(String id) {
+  Future<void> onButtonPressed(String id) async {
     if (id == 'stopService') {
-      FlutterForegroundTask.stopService();
+      await FlutterForegroundTask.stopService();
+      sendPort?.send(id);
     }
   }
 }
