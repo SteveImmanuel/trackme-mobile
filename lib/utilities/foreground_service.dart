@@ -53,7 +53,6 @@ class LocationTaskHandler extends TaskHandler {
   @override
   Future<void> onButtonPressed(String id) async {
     if (id == 'stopService') {
-      await FlutterForegroundTask.stopService();
       sendPort?.send(id);
     }
   }

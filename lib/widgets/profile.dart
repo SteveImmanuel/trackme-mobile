@@ -24,14 +24,15 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  late SharedPreferences prefs;
   late final List<bool> _isActive = [false];
   final List<int> _postIntervalList = [2, 5, 10, 15, 30, 60];
-  late SharedPreferences prefs;
   int _postInterval = 10;
   bool _isLoading = false;
   ReceivePort? _receivePort;
   DateTime _lastPostTimestamp = DateTime.now();
   bool _isPosting = false;
+  bool _firstTimeActive = true;
 
   @override
   void initState() {
@@ -105,16 +106,17 @@ class _ProfileState extends State<Profile> {
   Future<void> _onReceivedFromForeground(dynamic msg) async {
     if (msg is String) {
       if (msg == LocationTaskHandler.stopKeyword) {
+        await _stopForegroundTask();
         setState(() {
           _isActive[0] = !_isActive[0];
         });
       }
-
-    }else {
+    } else {
       DateTime now = DateTime.now();
       int diff = now.difference(_lastPostTimestamp).inMinutes;
-      if (diff >= _postInterval && !_isPosting) {
+      if ((diff >= _postInterval && !_isPosting) || _firstTimeActive) {
         _isPosting = true;
+        _firstTimeActive = false;
         Map<String, dynamic> postResult = await _postCurrentLocation();
         if (postResult['code'] == 200) {
           String formattedNow = DateFormat('hh:mm a').format(now);
@@ -131,6 +133,7 @@ class _ProfileState extends State<Profile> {
   }
 
   Future<bool> _stopForegroundTask() async {
+    _firstTimeActive = true;
     return await FlutterForegroundTask.stopService();
   }
 
@@ -140,7 +143,7 @@ class _ProfileState extends State<Profile> {
     if (!(await FlutterForegroundTask.isRunningService)) {
       receivePort = await FlutterForegroundTask.startService(
         notificationTitle: 'Tracking Service is ON',
-        notificationText: 'Last Posted: -',
+        notificationText: 'Initializing',
         callback: startCallback,
       );
     }
