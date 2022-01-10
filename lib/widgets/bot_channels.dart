@@ -55,7 +55,10 @@ class BotChannelListItem extends StatelessWidget {
             child: InkWell(
               child: const Padding(
                 padding: EdgeInsets.all(10),
-                child: Icon(Icons.delete),
+                child: Icon(
+                  Icons.delete,
+                  color: Colors.black87,
+                ),
               ),
               onTap: () => onDeleteTapped(context, idx, name),
             ),
@@ -84,7 +87,7 @@ class _BotChannelListState extends CustomListState<BotChannelList> {
         .map((channel) => channel.toJson())
         .toList();
 
-    Map<String,dynamic> updateResult = await updateUser({
+    Map<String, dynamic> updateResult = await updateUser({
       'bot_channels': [
         ...updateData.sublist(0, idx),
         ...updateData.sublist(idx + 1)

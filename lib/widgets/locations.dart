@@ -87,7 +87,10 @@ class LocationListItem extends StatelessWidget {
                   child: InkWell(
                     child: const Padding(
                       padding: EdgeInsets.all(10),
-                      child: Icon(Icons.delete),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.black87,
+                      ),
                     ),
                     onTap: () => onDeleteTapped(context, idx, name),
                   ),
@@ -112,13 +115,15 @@ class LocationList extends CustomList {
 
 class _LocationListState extends CustomListState<LocationList> {
   void _onUpdateLocation(BuildContext context, int idx) {
-    Navigator.pushNamed(context, ChooseLocation.route,
-        arguments: LocationArgs(
+    Navigator.pushNamed(
+      context,
+      ChooseLocation.route,
+      arguments: LocationArgs(
           callback: widget.reloadUserData,
           currentLocationList: listData as List<Location>,
           currentIndex: idx,
-          parentContext: context
-        ));
+          parentContext: context),
+    );
   }
 
   @override
@@ -129,7 +134,7 @@ class _LocationListState extends CustomListState<LocationList> {
         .map((location) => location.toJson())
         .toList();
 
-    Map<String,dynamic> updateResult = await updateUser({
+    Map<String, dynamic> updateResult = await updateUser({
       'locations': [
         ...updateData.sublist(0, idx),
         ...updateData.sublist(idx + 1)

@@ -3,7 +3,6 @@ import 'package:trackme/utilities/custom_callback_types.dart';
 import 'package:trackme/widgets/custom_list.dart';
 import 'package:trackme/utilities/api.dart';
 
-
 class AliasListItem extends StatelessWidget {
   const AliasListItem({
     Key? key,
@@ -26,7 +25,10 @@ class AliasListItem extends StatelessWidget {
             child: InkWell(
               child: const Padding(
                 padding: EdgeInsets.all(10),
-                child: Icon(Icons.delete),
+                child: Icon(
+                  Icons.delete,
+                  color: Colors.black87,
+                ),
               ),
               onTap: () => onDeleteTapped(context, idx, name),
             ),
@@ -50,7 +52,7 @@ class _AliasListState extends CustomListState<AliasList> {
   Future<void> onConfirmDelete(BuildContext context, int idx) async {
     super.onConfirmDelete(context, idx);
 
-    Map<String,dynamic> updateResult = await updateUser({
+    Map<String, dynamic> updateResult = await updateUser({
       'aliases': [...listData.sublist(0, idx), ...listData.sublist(idx + 1)],
     });
 
