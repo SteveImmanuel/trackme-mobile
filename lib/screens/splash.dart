@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:trackme/utilities/api.dart';
 import 'package:trackme/screens/home.dart';
 import 'package:trackme/screens/auth.dart';
@@ -15,6 +16,7 @@ class Splash extends StatefulWidget {
 
 class _SplashState extends State<Splash> {
   Future<void> _initializeApp() async {
+    await dotenv.load(fileName: '.env');
     await initializeApi();
     Map<String, dynamic> authCheckResult = await authCheck();
 

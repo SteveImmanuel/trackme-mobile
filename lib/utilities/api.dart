@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const String apiUrl = 'https://api.trackme.tk';
+String apiUrl = dotenv.env['API_URL'] as String;
 FlutterSecureStorage storage = const FlutterSecureStorage();
 String accessToken = 'None';
 String refreshToken = 'None';
@@ -161,12 +162,17 @@ Future<Map<String, dynamic>> generateBotToken() {
   return postAuthenticated('$apiUrl/bot/token', {});
 }
 
-Future<Map<String, dynamic>> postLocation(String latitude, String longitude) {
+Future<Map<String, dynamic>> postLocation(
+  String latitude,
+  String longitude,
+  int batteryLevel,
+) {
   return postAuthenticated(
     '$apiUrl/location',
     {
-      "latitude": latitude,
-      "longitude": longitude,
+      'latitude': latitude,
+      'longitude': longitude,
+      'battery_level': batteryLevel,
     },
   );
 }
