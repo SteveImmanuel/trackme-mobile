@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:provider/provider.dart';
+import 'package:battery_plus/battery_plus.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:location/location.dart';
 import 'package:trackme/utilities/api.dart';
@@ -24,6 +25,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  final Battery battery = Battery();
   late SharedPreferences prefs;
   late final List<bool> _isActive = [false];
   final List<int> _postIntervalList = [2, 5, 10, 15, 30, 60];
@@ -33,6 +35,7 @@ class _ProfileState extends State<Profile> {
   DateTime _lastPostTimestamp = DateTime.now();
   bool _isPosting = false;
   bool _firstTimeActive = true;
+
 
   @override
   void initState() {
@@ -72,8 +75,12 @@ class _ProfileState extends State<Profile> {
 
   Future<Map<String, dynamic>> _postCurrentLocation() async {
     LocationData currentLocation = await getCurrentLocation();
-    return await postLocation(currentLocation.latitude.toString(),
-        currentLocation.longitude.toString());
+    int batteryLevel = await battery.batteryLevel;
+    return await postLocation(
+      currentLocation.latitude.toString(),
+      currentLocation.longitude.toString(),
+      batteryLevel,
+    );
   }
 
   Future<void> _onSubmitLocation(BuildContext context) async {
