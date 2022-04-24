@@ -3,18 +3,18 @@
   <component name="AndroidLogFilters">
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="45081f7c-c20b-4800-9f50-778eaa5ac2a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="45081f7c-c20b-4800-9f50-778eaa5ac2a8" name="Default Changelist" comment="Always post location on first start">
+      <change afterPath="$PROJECT_DIR$/lib/widgets/tracking.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screens/splash.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/splash.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/utilities/api.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/utilities/api.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/home.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/widgets/profile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/profile.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,16 +30,27 @@
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="cidr.known.project.marker" value="true" />
     <property name="dart.analysis.tool.window.force.activate" value="false" />
+    <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="io.flutter.reload.alreadyRun" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -120,6 +131,17 @@
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.env" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Change package name" />
@@ -132,47 +154,5 @@
     <MESSAGE value="Adjust task interval" />
     <MESSAGE value="Always post location on first start" />
     <option name="LAST_COMMIT_MESSAGE" value="Always post location on first start" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="323" y="130" width="790" height="854" key="CommitChangelistDialog2" timestamp="1645531781100">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state x="323" y="130" width="790" height="854" key="CommitChangelistDialog2/60.27.1860.1053@60.27.1860.1053" timestamp="1645531781100" />
-    <state width="1200" height="234" key="GridCell.Tab.0.bottom" timestamp="1645529107294">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state width="1200" height="234" key="GridCell.Tab.0.bottom/60.27.1860.1053@60.27.1860.1053" timestamp="1645529107294" />
-    <state width="1200" height="234" key="GridCell.Tab.0.center" timestamp="1645529107293">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state width="1200" height="234" key="GridCell.Tab.0.center/60.27.1860.1053@60.27.1860.1053" timestamp="1645529107293" />
-    <state width="1200" height="234" key="GridCell.Tab.0.left" timestamp="1645529107292">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state width="1200" height="234" key="GridCell.Tab.0.left/60.27.1860.1053@60.27.1860.1053" timestamp="1645529107292" />
-    <state width="1200" height="234" key="GridCell.Tab.0.right" timestamp="1645529107293">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state width="1200" height="234" key="GridCell.Tab.0.right/60.27.1860.1053@60.27.1860.1053" timestamp="1645529107293" />
-    <state x="501" y="246" width="363" height="621" key="RollbackChangesDialog" timestamp="1645525855593">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state x="501" y="246" width="363" height="621" key="RollbackChangesDialog/60.27.1860.1053@60.27.1860.1053" timestamp="1645525855593" />
-    <state x="160" y="127" width="1056" height="853" key="com.android.tools.idea.avdmanager.AvdListDialog" timestamp="1645522207585">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state x="160" y="127" width="1056" height="853" key="com.android.tools.idea.avdmanager.AvdListDialog/60.27.1860.1053@60.27.1860.1053" timestamp="1645522207585" />
-    <state x="374" y="381" key="com.intellij.ide.util.TipDialog" timestamp="1645525319116">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state x="374" y="381" key="com.intellij.ide.util.TipDialog/60.27.1860.1053@60.27.1860.1053" timestamp="1645525319116" />
-    <state x="370" y="292" width="696" height="522" key="find.popup" timestamp="1645525892343">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state x="370" y="292" width="696" height="522" key="find.popup/60.27.1860.1053@60.27.1860.1053" timestamp="1645525892343" />
-    <state x="386" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1645528607480">
-      <screen x="60" y="27" width="1860" height="1053" />
-    </state>
-    <state x="386" y="259" width="672" height="678" key="search.everywhere.popup/60.27.1860.1053@60.27.1860.1053" timestamp="1645528607480" />
   </component>
 </project>
