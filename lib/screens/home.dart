@@ -8,7 +8,7 @@ import 'package:trackme/widgets/bot_channels.dart';
 import 'package:trackme/widgets/locations.dart';
 import 'package:trackme/widgets/tracking.dart';
 import 'package:trackme/widgets/aliases.dart';
-import 'package:trackme/widgets/profile.dart';
+import 'package:trackme/widgets/account.dart';
 import 'package:trackme/models/user.dart';
 import 'package:trackme/utilities/api.dart';
 import 'package:trackme/utilities/route_arguments.dart';
@@ -44,8 +44,8 @@ class _HomeState extends State<Home> {
     initForegroundTask();
     _children = [
       ChildItem(
-        title: 'Profile',
-        widget: Profile(
+        title: 'Account',
+        widget: Account(
           reloadUserData: _loadUserData,
         ),
       ),
