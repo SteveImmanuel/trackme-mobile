@@ -5,68 +5,135 @@ import 'package:trackme/models/user.dart';
 import 'package:trackme/widgets/custom_list.dart';
 import 'package:trackme/widgets/token_generator.dart';
 import 'package:trackme/utilities/api.dart';
+import 'package:trackme/utilities/snackbar_factory.dart';
 
-class BotChannelListItem extends StatelessWidget {
-  const BotChannelListItem({
-    Key? key,
-    required this.name,
-    required this.type,
-    required this.photoUrl,
-    required this.platform,
-    required this.idx,
-    required this.onDeleteTapped,
-  }) : super(key: key);
-
+class BotChannelListItem extends StatefulWidget {
+  final int idx;
   final String name;
   final String type;
   final String platform;
   final String photoUrl;
-  final int idx;
   final DeleteListItem onDeleteTapped;
+  final bool indirectMentionNotif;
+  final UpdateIndirectNotif onUpdateIndirectNotif;
+
+  const BotChannelListItem({
+    Key? key,
+    required this.idx,
+    required this.name,
+    required this.type,
+    required this.photoUrl,
+    required this.platform,
+    required this.onDeleteTapped,
+    required this.indirectMentionNotif,
+    required this.onUpdateIndirectNotif,
+  }) : super(key: key);
+
+  @override
+  State<BotChannelListItem> createState() => _BotChannelListItemState();
+}
+
+class _BotChannelListItemState extends State<BotChannelListItem> {
+  late bool isNotifOn = widget.indirectMentionNotif;
+
+  void _toggleIndirectNotif(BuildContext context, bool value) {
+    widget.onUpdateIndirectNotif(context, widget.idx, value);
+    setState(() {
+      isNotifOn = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     String icon = 'line_icon.png';
-    if (platform == 'telegram') {
+    if (widget.platform == 'telegram') {
       icon = 'telegram_icon.png';
     }
 
     return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          radius: 20,
-          backgroundImage: NetworkImage(photoUrl),
-        ),
-        title: Text(name),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 5),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/$icon',
-                scale: 5.5,
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(2, 0, 12, 0),
+              child: CircleAvatar(
+                radius: 23,
+                backgroundImage: NetworkImage(widget.photoUrl),
               ),
-              const SizedBox(width: 5),
-              Text(type),
-            ],
-          ),
-        ),
-        trailing: ClipOval(
-          child: Material(
-            child: InkWell(
-              child: const Padding(
-                padding: EdgeInsets.all(10),
-                child: Icon(
-                  Icons.delete,
-                  color: Colors.black87,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.name,
+                    style: const TextStyle(
+                      fontSize: 17,
+                    ),
+                  ),
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          child: Image.asset(
+                            'assets/images/$icon',
+                            scale: 5.5,
+                          ),
+                          height: 25,
+                          width: 30,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(widget.type),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        child: Switch(
+                          onChanged: (bool value) => {
+                            _toggleIndirectNotif(context, value),
+                          },
+                          value: isNotifOn,
+                        ),
+                        height: 25,
+                        width: 30,
+                      ),
+                      const SizedBox(width: 10),
+                      const Text('Indirect Mention Notification'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: ClipOval(
+                child: Material(
+                  child: InkWell(
+                    child: const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    onTap: () => widget.onDeleteTapped(
+                      context,
+                      widget.idx,
+                      widget.name,
+                    ),
+                  ),
                 ),
               ),
-              onTap: () => onDeleteTapped(context, idx, name),
             ),
-          ),
+          ],
         ),
-        onTap: null,
       ),
     );
   }
@@ -81,6 +148,41 @@ class BotChannelList extends CustomList {
 }
 
 class _BotChannelListState extends CustomListState<BotChannelList> {
+  Future<void> _updateIndirectNotif(
+      BuildContext context, int idx, bool value) async {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+      duration: 3000000,
+      type: SnackBarType.loading,
+      content: 'Updating ${widget.type}',
+    ));
+
+    List<Map<String, dynamic>> updateData = (listData as List<BotChannel>)
+        .map((channel) => channel.toJson())
+        .toList();
+    updateData[idx]['indirect_mention_notif'] = value;
+
+    Map<String, dynamic> updateResult = await updateUser({
+      'bot_channels': updateData,
+    });
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    if (updateResult['code'] == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+        duration: 1000,
+        type: SnackBarType.success,
+        content: 'Update ${widget.type} Success',
+      ));
+    } else if (updateResult['code'] != 401) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBarFactory.create(
+        duration: 1000,
+        type: SnackBarType.failed,
+        content: 'Update ${widget.type} Failed',
+      ));
+    }
+    widget.reloadUserData();
+  }
+
   @override
   Future<void> onConfirmDelete(BuildContext context, int idx) async {
     super.onConfirmDelete(context, idx);
@@ -113,7 +215,9 @@ class _BotChannelListState extends CustomListState<BotChannelList> {
       photoUrl: channel.photoUrl,
       platform: channel.platform,
       type: channel.type,
+      indirectMentionNotif: channel.indirectMentionNotif,
       onDeleteTapped: onDeleteTapped,
+      onUpdateIndirectNotif: _updateIndirectNotif,
     );
   }
 }
