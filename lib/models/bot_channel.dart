@@ -4,6 +4,7 @@ class BotChannel {
   String photoUrl;
   String displayName;
   String platform;
+  bool indirectMentionNotif;
 
   BotChannel(
     this.id,
@@ -11,6 +12,7 @@ class BotChannel {
     this.photoUrl,
     this.displayName,
     this.platform,
+    this.indirectMentionNotif,
   );
 
   BotChannel.fromJson(Map<String, dynamic> data)
@@ -18,13 +20,15 @@ class BotChannel {
         type = data['type'],
         photoUrl = data['photo_url'],
         displayName = data['display_name'],
-        platform = data['platform'];
+        platform = data['platform'],
+        indirectMentionNotif = data['indirect_mention_notif'] ?? false;
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'type': type,
         'photo_url': photoUrl,
         'display_name': displayName,
-        'platform': platform
+        'platform': platform,
+        'indirect_mention_notif': indirectMentionNotif
       };
 }
