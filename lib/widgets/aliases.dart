@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trackme/utilities/custom_callback_types.dart';
+import 'package:trackme/models/user.dart';
 import 'package:trackme/widgets/custom_list.dart';
 import 'package:trackme/utilities/api.dart';
 
@@ -57,6 +58,11 @@ class _AliasListState extends CustomListState<AliasList> {
     });
 
     afterDelete(context, updateResult['code']);
+  }
+
+  @override
+  List getListData(User user) {
+    return user.aliases;
   }
 
   @override

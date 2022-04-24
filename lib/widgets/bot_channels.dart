@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trackme/utilities/custom_callback_types.dart';
 import 'package:trackme/models/bot_channel.dart';
+import 'package:trackme/models/user.dart';
 import 'package:trackme/widgets/custom_list.dart';
 import 'package:trackme/widgets/token_generator.dart';
 import 'package:trackme/utilities/api.dart';
@@ -96,6 +97,11 @@ class _BotChannelListState extends CustomListState<BotChannelList> {
     });
 
     afterDelete(context, updateResult['code']);
+  }
+
+  @override
+  List getListData(User user) {
+    return user.botChannels;
   }
 
   @override

@@ -5,13 +5,16 @@ import 'package:trackme/utilities/custom_callback_types.dart';
 import 'package:trackme/utilities/snackbar_factory.dart';
 
 class CustomList extends StatefulWidget {
+  final ReloadUserData reloadUserData;
+  final String type;
+  final String emptyListMessage;
+
   const CustomList({
     Key? key,
     required this.type,
     required this.reloadUserData,
+    this.emptyListMessage = '',
   }) : super(key: key);
-  final ReloadUserData reloadUserData;
-  final String type;
 
   @override
   CustomListState createState() => CustomListState();
@@ -53,7 +56,8 @@ class CustomListState<T extends CustomList> extends State<T> {
     Navigator.pop(context);
   }
 
-  Future<void> onDeleteTapped(BuildContext parentContext, int idx, String name) {
+  Future<void> onDeleteTapped(
+      BuildContext parentContext, int idx, String name) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -91,6 +95,10 @@ class CustomListState<T extends CustomList> extends State<T> {
     return widget.reloadUserData();
   }
 
+  List getListData(User user) {
+    throw UnimplementedError();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<User>(
@@ -104,13 +112,18 @@ class CustomListState<T extends CustomList> extends State<T> {
             padding: const EdgeInsets.only(top: 15),
           );
         }
-        listData = user.getListPropertyByString(widget.type);
+
+        listData = getListData(user);
+        String emptyListMessage =
+            'Once you add ${widget.type.toLowerCase()}, it will be shown here';
+        if (widget.emptyListMessage != '') {
+          emptyListMessage = widget.emptyListMessage;
+        }
 
         Widget child = ListView(
           children: [
             Container(
-              child: Text(
-                  'Once you add ${widget.type.toLowerCase()}, it will be shown here'),
+              child: Text(emptyListMessage),
               alignment: Alignment.center,
             )
           ],

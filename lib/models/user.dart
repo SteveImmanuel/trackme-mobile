@@ -48,19 +48,4 @@ class User extends ChangeNotifier {
         'locations': locations.map((location) => location.toJson()).toList(),
         'bot_channels': botChannels.map((channel) => channel.toJson()).toList(),
       };
-
-  List getListPropertyByString(String property) {
-    switch (property) {
-      case 'Bot Channel':
-        return botChannels;
-      case 'Location':
-        return locations;
-      case 'Alias':
-        return aliases;
-      case 'Your Connected Account':
-        return linkedAccounts;
-      default:
-        return [];
-    }
-  }
 }
