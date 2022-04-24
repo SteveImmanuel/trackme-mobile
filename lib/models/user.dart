@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trackme/models/bot_channel.dart';
+import 'package:trackme/models/connected_account.dart';
 import 'package:trackme/models/location.dart';
 
 class User extends ChangeNotifier {
@@ -7,6 +8,7 @@ class User extends ChangeNotifier {
   List<String> aliases;
   List<Location> locations;
   List<BotChannel> botChannels;
+  List<ConnectedAccount> connectedAccounts;
   bool isReady;
 
   User()
@@ -14,7 +16,8 @@ class User extends ChangeNotifier {
         username = '',
         aliases = [],
         locations = [],
-        botChannels = [];
+        botChannels = [],
+        connectedAccounts=[];
 
   Future<void> setData(Map<String, dynamic> data) async {
     username = data['username'];
@@ -30,11 +33,17 @@ class User extends ChangeNotifier {
     botChannels =
         botChannelList.map((channel) => BotChannel.fromJson(channel)).toList();
 
+    List connectedAccountList = data['connected_accounts'] as List;
+    connectedAccounts =
+        connectedAccountList.map((account) =>
+            ConnectedAccount.fromJson(account)).toList();
+
     isReady = true;
     notifyListeners();
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         'username': username,
         'aliases': aliases,
         'locations': locations.map((location) => location.toJson()).toList(),
@@ -42,13 +51,15 @@ class User extends ChangeNotifier {
       };
 
   List getListPropertyByString(String property) {
-    switch(property){
+    switch (property) {
       case 'Bot Channel':
         return botChannels;
       case 'Location':
         return locations;
       case 'Alias':
         return aliases;
+      case 'Your Account':
+        return connectedAccounts;
       default:
         return [];
     }
