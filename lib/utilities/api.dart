@@ -7,6 +7,12 @@ String apiUrl = dotenv.env['API_URL'] as String;
 FlutterSecureStorage storage = const FlutterSecureStorage();
 String accessToken = 'None';
 String refreshToken = 'None';
+const errorNetworkResponse = {
+  'code': 502,
+  'detail':
+      'There is a network connection problem. Check your internet and try again later!',
+  'message': 'Network Connection Problem'
+};
 
 Future<Map<String, dynamic>> postAuthenticated(
   String url,
@@ -34,14 +40,18 @@ Future<Map<String, dynamic>> postAuthenticated(
     );
   }
 
-  Map<String, dynamic> decodedResult = jsonDecode(result.body);
-  if (decodedResult['code'] == 401 && retry > 0) {
-    Map<String, dynamic> silentLoginRes = await silentLogin();
-    if (silentLoginRes['code'] == 200) {
-      return postAuthenticated(url, body, retry: retry - 1);
+  try {
+    Map<String, dynamic> decodedResult = jsonDecode(result.body);
+    if (decodedResult['code'] == 401 && retry > 0) {
+      Map<String, dynamic> silentLoginRes = await silentLogin();
+      if (silentLoginRes['code'] == 200) {
+        return postAuthenticated(url, body, retry: retry - 1);
+      }
     }
+    return decodedResult;
+  } catch (e) {
+    return errorNetworkResponse;
   }
-  return decodedResult;
 }
 
 Future<Map<String, dynamic>> getAuthenticated(
@@ -53,14 +63,18 @@ Future<Map<String, dynamic>> getAuthenticated(
     'Authorization': 'Bearer $accessToken'
   });
 
-  Map<String, dynamic> decodedResult = jsonDecode(result.body);
-  if (decodedResult['code'] == 401 && retry > 0) {
-    Map<String, dynamic> silentLoginRes = await silentLogin();
-    if (silentLoginRes['code'] == 200) {
-      return getAuthenticated(url, retry: retry - 1);
+  try {
+    Map<String, dynamic> decodedResult = jsonDecode(result.body);
+    if (decodedResult['code'] == 401 && retry > 0) {
+      Map<String, dynamic> silentLoginRes = await silentLogin();
+      if (silentLoginRes['code'] == 200) {
+        return getAuthenticated(url, retry: retry - 1);
+      }
     }
+    return decodedResult;
+  } catch (e) {
+    return errorNetworkResponse;
   }
-  return decodedResult;
 }
 
 Future<void> initializeApi() async {
@@ -83,24 +97,27 @@ Future<Map<String, dynamic>> login(String username, String password) async {
         'Accept': 'application/json',
       });
 
-  if (result.statusCode == 200) {
+  try {
     String rawBody = result.body;
     Map<String, dynamic> decodedData = jsonDecode(rawBody);
-    await Future.wait([
-      storage.write(
-        key: 'accessToken',
-        value: decodedData['access_token'],
-      ),
-      storage.write(
-        key: 'refreshToken',
-        value: decodedData['refresh_token'],
-      ),
-    ]);
-    accessToken = decodedData['access_token'];
-    refreshToken = decodedData['refresh_token'];
+    if (result.statusCode == 200) {
+      await Future.wait([
+        storage.write(
+          key: 'accessToken',
+          value: decodedData['access_token'],
+        ),
+        storage.write(
+          key: 'refreshToken',
+          value: decodedData['refresh_token'],
+        ),
+      ]);
+      accessToken = decodedData['access_token'];
+      refreshToken = decodedData['refresh_token'];
+    }
+    return decodedData;
+  } catch (e) {
+    return errorNetworkResponse;
   }
-
-  return jsonDecode(result.body);
 }
 
 Future<Map<String, dynamic>> register(String username, String password) async {
@@ -114,7 +131,11 @@ Future<Map<String, dynamic>> register(String username, String password) async {
         'Accept': 'application/json',
       });
 
-  return jsonDecode(result.body);
+  try {
+    return jsonDecode(result.body);
+  } catch (e) {
+    return errorNetworkResponse;
+  }
 }
 
 Future<Map<String, dynamic>> silentLogin() async {
