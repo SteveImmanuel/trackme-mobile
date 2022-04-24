@@ -23,8 +23,6 @@ class ChildItem {
   ChildItem({required this.title, required this.widget});
 }
 
-class LocationListController {}
-
 class Home extends StatefulWidget {
   static String route = '/home';
 
@@ -47,7 +45,9 @@ class _HomeState extends State<Home> {
     _children = [
       ChildItem(
         title: 'Profile',
-        widget: const Profile(),
+        widget: Profile(
+          reloadUserData: _loadUserData,
+        ),
       ),
       ChildItem(
           title: 'Bot Channel',
