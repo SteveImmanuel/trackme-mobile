@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trackme/utilities/custom_callback_types.dart';
 import 'package:trackme/models/bot_channel.dart';
 import 'package:trackme/widgets/custom_list.dart';
+import 'package:trackme/widgets/token_generator.dart';
 import 'package:trackme/utilities/api.dart';
 
 class BotChannelListItem extends StatelessWidget {
@@ -121,53 +122,14 @@ class BotChannels extends StatefulWidget {
 }
 
 class _BotChannelsState extends State<BotChannels> {
-  String _token = '-';
-  bool _isGeneratingToken = false;
-
-  Future<void> _generateNewToken() async {
-    setState(() {
-      _isGeneratingToken = true;
-    });
-    Map<String, dynamic> tokenResult = await generateBotToken();
-    if (tokenResult['code'] == 200) {
-      setState(() {
-        _isGeneratingToken = false;
-        _token = tokenResult['detail']['token'];
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 20),
-        const Text(
-          'Your Token',
-          style: TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 25,
-          ),
-        ),
-        Text(
-          _token,
-          style: const TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 50,
-          ),
-        ),
-        ElevatedButton(
-          onPressed: _isGeneratingToken ? null : _generateNewToken,
-          child: _isGeneratingToken
-              ? const SizedBox(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.black45,
-                  ),
-                  height: 15,
-                  width: 15,
-                )
-              : const Icon(Icons.refresh),
+        const TokenGenerator(
+          generateToken: generateChannelToken,
+          tokenType: 'Channel',
         ),
         RichText(
           text: TextSpan(
@@ -181,7 +143,7 @@ class _BotChannelsState extends State<BotChannels> {
                       fontFamily: 'RobotoMono',
                       backgroundColor: Colors.black12),
                 ),
-                TextSpan(text: ' to the TrackMe bot')
+                TextSpan(text: ' to the TrackMe bot.')
               ]),
         ),
         const SizedBox(height: 20),

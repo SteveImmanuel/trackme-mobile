@@ -4,3 +4,4 @@ typedef DeleteListItem = void Function(BuildContext, int, String);
 typedef UpdateLatLong = void Function(double, double);
 typedef ReloadUserData = Future<void> Function();
 typedef OnUpdateLocation = void Function(BuildContext, int);
+typedef GenerateToken = Future<Map<String, dynamic>> Function();
