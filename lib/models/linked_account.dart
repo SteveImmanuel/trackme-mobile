@@ -1,17 +1,17 @@
-class ConnectedAccount {
+class LinkedAccount {
   String id;
   String photoUrl;
   String displayName;
   String platform;
 
-  ConnectedAccount(
+  LinkedAccount(
       this.id,
       this.photoUrl,
       this.displayName,
       this.platform,
       );
 
-  ConnectedAccount.fromJson(Map<String, dynamic> data)
+  LinkedAccount.fromJson(Map<String, dynamic> data)
       : id = data['id'],
         photoUrl = data['photo_url'],
         displayName = data['display_name'],

@@ -8,7 +8,7 @@ import 'package:trackme/widgets/bot_channels.dart';
 import 'package:trackme/widgets/locations.dart';
 import 'package:trackme/widgets/tracking.dart';
 import 'package:trackme/widgets/aliases.dart';
-import 'package:trackme/widgets/account.dart';
+import 'package:trackme/widgets/accounts.dart';
 import 'package:trackme/models/user.dart';
 import 'package:trackme/utilities/api.dart';
 import 'package:trackme/utilities/route_arguments.dart';
@@ -33,7 +33,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _currentIndex = 2;
+  int _currentIndex = 0; //TODO: Change this back to 2
   String _newAlias = '';
   final User _user = User();
   late List<ChildItem> _children;
@@ -44,8 +44,8 @@ class _HomeState extends State<Home> {
     initForegroundTask();
     _children = [
       ChildItem(
-        title: 'Account',
-        widget: Account(
+        title: 'Accounts',
+        widget: Accounts(
           reloadUserData: _loadUserData,
         ),
       ),
