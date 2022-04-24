@@ -158,8 +158,12 @@ Future<Map<String, dynamic>> updateUser(Map<String, dynamic> body) {
   return postAuthenticated('$apiUrl/user', body, isPut: true);
 }
 
-Future<Map<String, dynamic>> generateBotToken() {
-  return postAuthenticated('$apiUrl/bot/token', {});
+Future<Map<String, dynamic>> generateChannelToken() {
+  return postAuthenticated('$apiUrl/bot/token/channel', {});
+}
+
+Future<Map<String, dynamic>> generateUserToken() {
+  return postAuthenticated('$apiUrl/bot/token/user', {});
 }
 
 Future<Map<String, dynamic>> postLocation(
