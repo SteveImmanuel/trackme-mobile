@@ -33,7 +33,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _currentIndex = 0; //TODO: Change this back to 2
+  int _currentIndex = 2;
   String _newAlias = '';
   final User _user = User();
   late List<ChildItem> _children;
@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
     initForegroundTask();
     _children = [
       ChildItem(
-        title: 'Accounts',
+        title: 'Account',
         widget: Accounts(
           reloadUserData: _loadUserData,
         ),
