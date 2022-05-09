@@ -15,6 +15,10 @@ Future<void> initForegroundTask() async {
         name: 'launcher',
       ),
       buttons: [
+        NotificationButton(
+          id: LocationTaskHandler.toggleKeyword,
+          text: 'TOGGLE',
+        ),
         NotificationButton(id: LocationTaskHandler.stopKeyword, text: 'STOP'),
       ],
     ),
@@ -23,10 +27,7 @@ Future<void> initForegroundTask() async {
       playSound: false,
     ),
     foregroundTaskOptions: const ForegroundTaskOptions(
-      interval: 120000,
-      autoRunOnBoot: true,
-      allowWifiLock: true
-    ),
+        interval: 120000, autoRunOnBoot: true, allowWifiLock: true),
     printDevLog: true,
   );
 }
@@ -34,6 +35,7 @@ Future<void> initForegroundTask() async {
 class LocationTaskHandler extends TaskHandler {
   SendPort? sendPort;
   static String stopKeyword = 'stopService';
+  static String toggleKeyword = 'toggleService';
 
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
@@ -52,7 +54,8 @@ class LocationTaskHandler extends TaskHandler {
 
   @override
   Future<void> onButtonPressed(String id) async {
-    if (id == 'stopService') {
+    if (id == LocationTaskHandler.stopKeyword ||
+        id == LocationTaskHandler.toggleKeyword) {
       sendPort?.send(id);
     }
   }

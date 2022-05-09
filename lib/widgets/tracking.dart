@@ -1,17 +1,17 @@
 import 'dart:isolate';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:provider/provider.dart';
-import 'package:battery_plus/battery_plus.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
-import 'package:trackme/utilities/api.dart';
-import 'package:trackme/utilities/gps.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trackme/models/user.dart';
-import 'package:trackme/utilities/snackbar_factory.dart';
+import 'package:trackme/utilities/api.dart';
 import 'package:trackme/utilities/foreground_service.dart';
+import 'package:trackme/utilities/gps.dart';
+import 'package:trackme/utilities/snackbar_factory.dart';
 
 void startCallback() {
   FlutterForegroundTask.setTaskHandler(LocationTaskHandler());
@@ -29,13 +29,14 @@ class _TrackingState extends State<Tracking> {
   late SharedPreferences prefs;
   late final List<bool> _isActive = [false];
   final List<int> _postIntervalList = [2, 5, 10, 15, 30, 60];
+
   int _postInterval = 10;
   bool _isLoading = false;
   ReceivePort? _receivePort;
   DateTime _lastPostTimestamp = DateTime.now();
   bool _isPosting = false;
   bool _firstTimeActive = true;
-
+  bool _isPaused = false;
 
   @override
   void initState() {
@@ -74,13 +75,18 @@ class _TrackingState extends State<Tracking> {
   }
 
   Future<Map<String, dynamic>> _postCurrentLocation() async {
-    LocationData currentLocation = await getCurrentLocation();
-    int batteryLevel = await battery.batteryLevel;
-    return await postLocation(
-      currentLocation.latitude.toString(),
-      currentLocation.longitude.toString(),
-      batteryLevel,
-    );
+    try {
+      LocationData currentLocation = await getCurrentLocation();
+      int batteryLevel = await battery.batteryLevel;
+
+      return await postLocation(
+        currentLocation.latitude.toString(),
+        currentLocation.longitude.toString(),
+        batteryLevel,
+      );
+    } on String catch (e) {
+      return {'code': 500, 'message': e.toString()};
+    }
   }
 
   Future<void> _onSubmitLocation(BuildContext context) async {
@@ -101,7 +107,7 @@ class _TrackingState extends State<Tracking> {
       snackBar = SnackBarFactory.create(
         duration: 1000,
         type: SnackBarType.failed,
-        content: 'Post Location Failed',
+        content: postResult['message'],
       );
     }
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -117,25 +123,52 @@ class _TrackingState extends State<Tracking> {
         setState(() {
           _isActive[0] = !_isActive[0];
         });
-      }
-    } else {
-      DateTime now = DateTime.now();
-      int diff = now.difference(_lastPostTimestamp).inMinutes;
-      if ((diff >= _postInterval && !_isPosting) || _firstTimeActive) {
-        _isPosting = true;
-        _firstTimeActive = false;
-        Map<String, dynamic> postResult = await _postCurrentLocation();
-        if (postResult['code'] == 200) {
-          String formattedNow = DateFormat('hh:mm a').format(now);
+        return;
+      } else if (msg == LocationTaskHandler.toggleKeyword) {
+        _isPaused = !_isPaused;
+        if (_isPaused) {
           await FlutterForegroundTask.updateService(
-            notificationTitle: 'Tracking Service is ON',
-            notificationText: 'Last Posted: $formattedNow',
+            notificationTitle: 'Tracking Service is OFF',
+            notificationText: 'Paused, press TOGGLE to continue',
             callback: null,
           );
-          _lastPostTimestamp = now;
+          return;
+        } else {
+          await FlutterForegroundTask.updateService(
+            notificationTitle: 'Tracking Service is ON',
+            notificationText: 'Initializing',
+            callback: startCallback,
+          );
+          _firstTimeActive = true;
         }
-        _isPosting = false;
       }
+    }
+
+    DateTime now = DateTime.now();
+    int diff = now.difference(_lastPostTimestamp).inMinutes;
+
+    if ((diff >= _postInterval && !_isPosting && !_isPaused) ||
+        _firstTimeActive) {
+      _isPosting = true;
+      _firstTimeActive = false;
+
+      Map<String, dynamic> postResult = await _postCurrentLocation();
+      if (postResult['code'] == 200) {
+        String formattedNow = DateFormat('hh:mm a').format(now);
+        await FlutterForegroundTask.updateService(
+          notificationTitle: 'Tracking Service is ON',
+          notificationText: 'Last Posted: $formattedNow',
+          callback: null,
+        );
+        _lastPostTimestamp = now;
+      } else {
+        await FlutterForegroundTask.updateService(
+          notificationTitle: 'Tracking Service is ON',
+          notificationText: postResult['message'],
+          callback: null,
+        );
+      }
+      _isPosting = false;
     }
   }
 
@@ -158,7 +191,8 @@ class _TrackingState extends State<Tracking> {
     if (receivePort != null) {
       _receivePort = receivePort;
       _receivePort?.listen(_onReceivedFromForeground);
-
+      _isPaused = false;
+      _isPosting = false;
       return true;
     }
 
