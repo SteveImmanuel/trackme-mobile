@@ -20,27 +20,27 @@ Future<Map<String, dynamic>> postAuthenticated(
   int retry = 2,
   bool isPut = false,
 }) async {
-  Map<String, String> headers = {
-    'Accept': 'application/json',
-    'Content-type': 'application/json',
-    'Authorization': 'Bearer $accessToken'
-  };
-  http.Response result;
-  if (isPut) {
-    result = await http.put(
-      Uri.parse(url),
-      body: jsonEncode(body),
-      headers: headers,
-    );
-  } else {
-    result = await http.post(
-      Uri.parse(url),
-      body: jsonEncode(body),
-      headers: headers,
-    );
-  }
-
   try {
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    };
+    http.Response result;
+    if (isPut) {
+      result = await http.put(
+        Uri.parse(url),
+        body: jsonEncode(body),
+        headers: headers,
+      );
+    } else {
+      result = await http.post(
+        Uri.parse(url),
+        body: jsonEncode(body),
+        headers: headers,
+      );
+    }
+
     Map<String, dynamic> decodedResult = jsonDecode(result.body);
     if (decodedResult['code'] == 401 && retry > 0) {
       Map<String, dynamic> silentLoginRes = await silentLogin();
@@ -58,12 +58,12 @@ Future<Map<String, dynamic>> getAuthenticated(
   String url, {
   int retry = 2,
 }) async {
-  http.Response result = await http.get(Uri.parse(url), headers: {
-    'Accept': 'application/json',
-    'Authorization': 'Bearer $accessToken'
-  });
-
   try {
+    http.Response result = await http.get(Uri.parse(url), headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    });
+
     Map<String, dynamic> decodedResult = jsonDecode(result.body);
     if (decodedResult['code'] == 401 && retry > 0) {
       Map<String, dynamic> silentLoginRes = await silentLogin();
@@ -87,17 +87,17 @@ Future<void> initializeApi() async {
 }
 
 Future<Map<String, dynamic>> login(String username, String password) async {
-  http.Response result = await http.post(Uri.parse('$apiUrl/auth/login'),
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
-      headers: {
-        'Content-type': 'application/json',
-        'Accept': 'application/json',
-      });
-
   try {
+    http.Response result = await http.post(Uri.parse('$apiUrl/auth/login'),
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json',
+        });
+
     String rawBody = result.body;
     Map<String, dynamic> decodedData = jsonDecode(rawBody);
     if (result.statusCode == 200) {
@@ -121,17 +121,17 @@ Future<Map<String, dynamic>> login(String username, String password) async {
 }
 
 Future<Map<String, dynamic>> register(String username, String password) async {
-  http.Response result = await http.post(Uri.parse('$apiUrl/auth/register'),
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
-      headers: {
-        'Content-type': 'application/json',
-        'Accept': 'application/json',
-      });
-
   try {
+    http.Response result = await http.post(Uri.parse('$apiUrl/auth/register'),
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json',
+        });
+
     return jsonDecode(result.body);
   } catch (e) {
     return errorNetworkResponse;

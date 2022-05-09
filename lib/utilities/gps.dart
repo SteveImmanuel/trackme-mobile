@@ -23,6 +23,9 @@ Future<bool> requestAccess() async {
 }
 
 Future<LocationData> getCurrentLocation() async {
-  await requestAccess();
-  return location.getLocation();
+  bool accessGranted = await requestAccess();
+  if (accessGranted) {
+    return await location.getLocation();
+  }
+  throw ('Location Access Not Granted');
 }
