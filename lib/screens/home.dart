@@ -82,7 +82,7 @@ class _HomeState extends State<Home> {
     if (result['code'] == 200) {
       _user.setData(result['detail']);
     } else {
-      // Push to login, show snack bar session timeout
+      // TODO:Push to login on 401, show snack bar session timeout
     }
   }
 
