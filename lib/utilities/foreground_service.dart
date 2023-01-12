@@ -1,8 +1,13 @@
 import 'dart:isolate';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
-Future<void> initForegroundTask() async {
-  await FlutterForegroundTask.init(
+@pragma('vm:entry-point')
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(LocationTaskHandler());
+}
+
+void initForegroundTask() async {
+  FlutterForegroundTask.init(
     androidNotificationOptions: AndroidNotificationOptions(
       channelId: 'trackme_notif_channel',
       channelName: 'TrackMe Tracking Service',
@@ -19,7 +24,10 @@ Future<void> initForegroundTask() async {
           id: LocationTaskHandler.toggleKeyword,
           text: 'TOGGLE',
         ),
-        NotificationButton(id: LocationTaskHandler.stopKeyword, text: 'STOP'),
+        NotificationButton(
+          id: LocationTaskHandler.stopKeyword,
+          text: 'STOP',
+        ),
       ],
     ),
     iosNotificationOptions: const IOSNotificationOptions(
@@ -27,8 +35,13 @@ Future<void> initForegroundTask() async {
       playSound: false,
     ),
     foregroundTaskOptions: const ForegroundTaskOptions(
-        interval: 120000, autoRunOnBoot: true, allowWifiLock: true),
-    printDevLog: true,
+      interval: 120000,
+      autoRunOnBoot: true,
+      allowWifiLock: true,
+      isOnceEvent: false,
+      allowWakeLock: true,
+    ),
+    // printDevLog: true,
   );
 }
 
@@ -44,16 +57,16 @@ class LocationTaskHandler extends TaskHandler {
 
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
-    sendPort?.send(timestamp);
+    sendPort?.send(0);
   }
 
   @override
-  Future<void> onDestroy(DateTime timestamp) async {
+  Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
     await FlutterForegroundTask.clearAllData();
   }
 
   @override
-  Future<void> onButtonPressed(String id) async {
+  onButtonPressed(String id) {
     if (id == LocationTaskHandler.stopKeyword ||
         id == LocationTaskHandler.toggleKeyword) {
       sendPort?.send(id);
