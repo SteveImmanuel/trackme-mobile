@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:location/location.dart';
+// import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:trackme/utilities/custom_callback_types.dart';
 import 'package:trackme/utilities/api.dart';
 import 'package:trackme/utilities/gps.dart';
@@ -41,10 +42,10 @@ class _MapViewerState extends State<MapViewer> {
   }
 
   Future<void> _getCurrentPosition() async {
-    LocationData curPos = await getCurrentLocation();
+    Position curPos = await getCurrentLocation();
 
-    double latitude = curPos.latitude ?? 50.010083;
-    double longitude = curPos.longitude ?? -110.113006;
+    double latitude = curPos.latitude;
+    double longitude = curPos.longitude;
     _mapController.move(LatLng(latitude, longitude), _mapController.zoom);
     widget.updateLatLongCallback(latitude, longitude);
   }

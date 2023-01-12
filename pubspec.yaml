@@ -33,7 +33,7 @@ dependencies:
   flutter_foreground_task: ^3.10.0
   battery_plus: ^3.0.2
   flutter_dotenv: ^5.0.2
-
+  geolocator: ^9.0.2
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,5 @@
 import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 
 Location location = Location();
 
@@ -22,10 +23,10 @@ Future<bool> requestAccess() async {
   return true;
 }
 
-Future<LocationData> getCurrentLocation() async {
+Future<Position> getCurrentLocation() async {
   bool accessGranted = await requestAccess();
   if (accessGranted) {
-    return await location.getLocation();
+    return await Geolocator.getCurrentPosition();
   }
   throw ('Location Access Not Granted');
 }

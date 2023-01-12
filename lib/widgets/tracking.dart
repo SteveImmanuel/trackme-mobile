@@ -4,7 +4,7 @@ import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:intl/intl.dart';
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trackme/models/user.dart';
@@ -12,10 +12,6 @@ import 'package:trackme/utilities/api.dart';
 import 'package:trackme/utilities/foreground_service.dart';
 import 'package:trackme/utilities/gps.dart';
 import 'package:trackme/utilities/snackbar_factory.dart';
-
-void startCallback() {
-  FlutterForegroundTask.setTaskHandler(LocationTaskHandler());
-}
 
 class Tracking extends StatefulWidget {
   const Tracking({Key? key}) : super(key: key);
@@ -76,7 +72,7 @@ class _TrackingState extends State<Tracking> {
 
   Future<Map<String, dynamic>> _postCurrentLocation() async {
     try {
-      LocationData currentLocation = await getCurrentLocation();
+      Position currentLocation = await getCurrentLocation();
       int batteryLevel = await battery.batteryLevel;
 
       return await postLocation(
@@ -179,14 +175,18 @@ class _TrackingState extends State<Tracking> {
 
   Future<bool> _startForegroundTask() async {
     ReceivePort? receivePort;
-
+    bool reqResult = false;
     if (!(await FlutterForegroundTask.isRunningService)) {
-      receivePort = await FlutterForegroundTask.startService(
+      reqResult = await FlutterForegroundTask.startService(
         notificationTitle: 'Tracking Service is ON',
         notificationText: 'Initializing',
         callback: startCallback,
       );
     }
+    if (reqResult) {
+      receivePort = await FlutterForegroundTask.receivePort;
+    }
+    _closeReceivePort();
 
     if (receivePort != null) {
       _receivePort = receivePort;
@@ -199,9 +199,14 @@ class _TrackingState extends State<Tracking> {
     return false;
   }
 
+  void _closeReceivePort() {
+    _receivePort?.close();
+    _receivePort = null;
+  }
+
   @override
   void dispose() {
-    _receivePort?.close();
+    _closeReceivePort();
     super.dispose();
   }
 
