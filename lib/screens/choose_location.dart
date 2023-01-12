@@ -67,10 +67,10 @@ class _MapViewerState extends State<MapViewer> {
               }
             },
           ),
-          layers: [
-            TileLayerOptions(
-              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              subdomains: ['a', 'b', 'c'],
+          children: [
+            TileLayer(
+              urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              userAgentPackageName: "id.steve.trackme",
             ),
           ],
         ),
