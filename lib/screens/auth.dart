@@ -138,7 +138,7 @@ class _AuthState extends State<Auth> {
                       padding: const EdgeInsets.all(15),
                     ),
                     style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).colorScheme.primary),
+                        backgroundColor: Theme.of(context).colorScheme.primary),
                     onPressed: _isLoading ? null : () => _onSubmit(context),
                   ),
                 )
