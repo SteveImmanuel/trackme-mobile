@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trackme/utilities/custom_callback_types.dart';
+import 'package:flutter/services.dart';
 
 class TokenGenerator extends StatefulWidget {
   final GenerateToken generateToken;
@@ -32,6 +33,10 @@ class _TokenGeneratorState extends State<TokenGenerator> {
     }
   }
 
+  Future<void> _onTokenTapped() async {
+    await Clipboard.setData(ClipboardData(text: _token));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -43,12 +48,19 @@ class _TokenGeneratorState extends State<TokenGenerator> {
             fontSize: 25,
           ),
         ),
-        Text(
-          _token,
-          style: const TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 50,
+        InkWell(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Text(
+              _token,
+              style: const TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 50,
+              ),
+            ),
           ),
+          onTap: _token == '-' ? null : _onTokenTapped,
+          borderRadius: BorderRadius.circular(12),
         ),
         ElevatedButton(
           onPressed: _isGeneratingToken ? null : _generateNewToken,
