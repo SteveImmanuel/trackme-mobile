@@ -1,4 +1,5 @@
 import 'dart:isolate';
+import 'dart:io' show Platform;
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 @pragma('vm:entry-point')
@@ -6,7 +7,7 @@ void startCallback() {
   FlutterForegroundTask.setTaskHandler(LocationTaskHandler());
 }
 
-void initForegroundTask() async {
+void initForegroundTask() {
   FlutterForegroundTask.init(
     androidNotificationOptions: AndroidNotificationOptions(
       channelId: 'trackme_notif_channel',
@@ -24,10 +25,7 @@ void initForegroundTask() async {
           id: LocationTaskHandler.toggleKeyword,
           text: 'TOGGLE',
         ),
-        NotificationButton(
-          id: LocationTaskHandler.stopKeyword,
-          text: 'STOP',
-        ),
+        NotificationButton(id: LocationTaskHandler.stopKeyword, text: 'STOP'),
       ],
     ),
     iosNotificationOptions: const IOSNotificationOptions(
@@ -35,28 +33,28 @@ void initForegroundTask() async {
       playSound: false,
     ),
     foregroundTaskOptions: const ForegroundTaskOptions(
-      interval: 120000,
+      interval: 4000, // TODO: change back this to 120000
       autoRunOnBoot: true,
       allowWifiLock: true,
-      isOnceEvent: false,
       allowWakeLock: true,
+      isOnceEvent: false,
     ),
-    // printDevLog: true,
   );
 }
 
 class LocationTaskHandler extends TaskHandler {
-  SendPort? sendPort;
+  SendPort? _sendPort;
   static String stopKeyword = 'stopService';
   static String toggleKeyword = 'toggleService';
 
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
-    this.sendPort = sendPort;
+    _sendPort = sendPort;
   }
 
   @override
-  Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
+  Future<void> onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
+    // sendPort?.send(timestamp); For some reason, cannot send timestamp obj as shown in the example
     sendPort?.send(0);
   }
 
@@ -66,10 +64,26 @@ class LocationTaskHandler extends TaskHandler {
   }
 
   @override
-  onButtonPressed(String id) {
+  Future<void> onNotificationButtonPressed(String id) async {
     if (id == LocationTaskHandler.stopKeyword ||
         id == LocationTaskHandler.toggleKeyword) {
-      sendPort?.send(id);
+      _sendPort?.send(id);
     }
+  }
+}
+
+Future<void> requestPermissionForAndroid() async {
+  if (!Platform.isAndroid) {
+    return;
+  }
+
+  if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
+    await FlutterForegroundTask.requestIgnoreBatteryOptimization();
+  }
+
+  final NotificationPermission notificationPermissionStatus =
+  await FlutterForegroundTask.checkNotificationPermission();
+  if (notificationPermissionStatus != NotificationPermission.granted) {
+    await FlutterForegroundTask.requestNotificationPermission();
   }
 }

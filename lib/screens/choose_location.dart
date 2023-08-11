@@ -69,8 +69,8 @@ class _MapViewerState extends State<MapViewer> {
           ),
           children: [
             TileLayer(
-              urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-              userAgentPackageName: "id.steve.trackme",
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.app',
             ),
           ],
         ),
