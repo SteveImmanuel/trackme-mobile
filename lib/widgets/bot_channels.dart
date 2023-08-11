@@ -91,22 +91,25 @@ class _BotChannelListItemState extends State<BotChannelListItem> {
                       ],
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        child: Switch(
-                          onChanged: (bool value) => {
-                            _toggleIndirectNotif(context, value),
-                          },
-                          value: isNotifOn,
+                  Visibility(
+                    visible: widget.type == 'Group',
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          child: Switch(
+                            onChanged: (bool value) => {
+                              _toggleIndirectNotif(context, value),
+                            },
+                            value: isNotifOn,
+                          ),
+                          height: 25,
+                          width: 30,
                         ),
-                        height: 25,
-                        width: 30,
-                      ),
-                      const SizedBox(width: 10),
-                      const Text('Indirect Mention Notification'),
-                    ],
+                        const SizedBox(width: 10),
+                        const Text('Mention Notification'),
+                      ],
+                    ),
                   ),
                 ],
               ),
