@@ -1,20 +1,21 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:provider/provider.dart';
+import 'package:trackme/main.dart';
+import 'package:trackme/models/user.dart';
 import 'package:trackme/screens/choose_location.dart';
+import 'package:trackme/utilities/api.dart';
+import 'package:trackme/utilities/foreground_service.dart';
+import 'package:trackme/utilities/route_arguments.dart';
+import 'package:trackme/utilities/snackbar_factory.dart';
+import 'package:trackme/widgets/accounts.dart';
+import 'package:trackme/widgets/aliases.dart';
 import 'package:trackme/widgets/bot_channels.dart';
 import 'package:trackme/widgets/locations.dart';
 import 'package:trackme/widgets/tracking.dart';
-import 'package:trackme/widgets/aliases.dart';
-import 'package:trackme/widgets/accounts.dart';
-import 'package:trackme/models/user.dart';
-import 'package:trackme/utilities/api.dart';
-import 'package:trackme/utilities/route_arguments.dart';
-import 'package:trackme/main.dart';
-import 'package:trackme/utilities/snackbar_factory.dart';
-import 'package:trackme/utilities/foreground_service.dart';
 
 class ChildItem {
   String title;
@@ -41,7 +42,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    initForegroundTask();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await requestPermissionForAndroid();
+      initForegroundTask();
+    });
     _children = [
       ChildItem(
         title: 'Account',
