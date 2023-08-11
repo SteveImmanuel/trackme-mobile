@@ -1,9 +1,9 @@
 import 'dart:isolate';
+import 'package:intl/intl.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -74,7 +74,6 @@ class _TrackingState extends State<Tracking> {
     try {
       Position currentLocation = await getCurrentLocation();
       int batteryLevel = await battery.batteryLevel;
-
       return await postLocation(
         currentLocation.latitude.toString(),
         currentLocation.longitude.toString(),
@@ -173,35 +172,39 @@ class _TrackingState extends State<Tracking> {
     return await FlutterForegroundTask.stopService();
   }
 
-  Future<bool> _startForegroundTask() async {
-    ReceivePort? receivePort;
-    bool reqResult = false;
-    if (!(await FlutterForegroundTask.isRunningService)) {
-      reqResult = await FlutterForegroundTask.startService(
-        notificationTitle: 'Tracking Service is ON',
-        notificationText: 'Initializing',
-        callback: startCallback,
-      );
+  bool _registerReceivePort(ReceivePort? newReceivePort) {
+    if (newReceivePort == null) {
+      return false;
     }
-    if (reqResult) {
-      receivePort = await FlutterForegroundTask.receivePort;
-    }
+
     _closeReceivePort();
+    _receivePort = newReceivePort;
+    _receivePort?.listen(_onReceivedFromForeground);
 
-    if (receivePort != null) {
-      _receivePort = receivePort;
-      _receivePort?.listen(_onReceivedFromForeground);
-      _isPaused = false;
-      _isPosting = false;
-      return true;
-    }
-
-    return false;
+    return _receivePort != null;
   }
 
   void _closeReceivePort() {
     _receivePort?.close();
     _receivePort = null;
+  }
+
+  Future<bool> _startForegroundTask() async {
+    final ReceivePort? receivePort = FlutterForegroundTask.receivePort;
+    final bool isRegistered = _registerReceivePort(receivePort);
+
+    if (!isRegistered) {
+      return false;
+    }
+
+    if (!(await FlutterForegroundTask.isRunningService)) {
+      FlutterForegroundTask.startService(
+        notificationTitle: 'Tracking Service is ON',
+        notificationText: 'Initializing',
+        callback: startCallback,
+      );
+    }
+    return true;
   }
 
   @override

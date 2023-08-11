@@ -33,7 +33,7 @@ void initForegroundTask() {
       playSound: false,
     ),
     foregroundTaskOptions: const ForegroundTaskOptions(
-      interval: 4000, // TODO: change back this to 120000
+      interval: 120000,
       autoRunOnBoot: true,
       allowWifiLock: true,
       allowWakeLock: true,
@@ -55,7 +55,7 @@ class LocationTaskHandler extends TaskHandler {
   @override
   Future<void> onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
     // sendPort?.send(timestamp); For some reason, cannot send timestamp obj as shown in the example
-    sendPort?.send(0);
+    sendPort?.send('');
   }
 
   @override
