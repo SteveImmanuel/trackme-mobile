@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trackme/utilities/custom_callback_types.dart';
 import 'package:flutter/services.dart';
+import 'package:trackme/utilities/snackbar_factory.dart';
 
 class TokenGenerator extends StatefulWidget {
   final GenerateToken generateToken;
@@ -35,6 +36,13 @@ class _TokenGeneratorState extends State<TokenGenerator> {
 
   Future<void> _onTokenTapped() async {
     await Clipboard.setData(ClipboardData(text: _token));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    SnackBar snackBar = SnackBarFactory.create(
+      duration: 500,
+      type: SnackBarType.success,
+      content: 'Token Copied to Clipboard',
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
