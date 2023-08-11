@@ -104,12 +104,12 @@ class CustomListState<T extends CustomList> extends State<T> {
     return Consumer<User>(
       builder: (context, user, child) {
         if (!user.isReady) {
-          return Padding(
+          return const Padding(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [CircularProgressIndicator()],
+              children: [CircularProgressIndicator()],
             ),
-            padding: const EdgeInsets.only(top: 15),
+            padding: EdgeInsets.only(top: 15),
           );
         }
 
